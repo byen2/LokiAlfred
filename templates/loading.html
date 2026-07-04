@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Processing...</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { display:flex; justify-content:center; align-items:center; height:100vh; flex-direction:column; font-family:'Inter',sans-serif; background:#f5f6fa; animation:fadeIn 0.5s ease forwards; }
+    @keyframes fadeIn { to { opacity:1; } }
+    h2 { color:#0984e3; margin-bottom:10px; }
+    .spinner { border:6px solid #f3f3f3; border-top:6px solid #0984e3; border-radius:50%; width:60px; height:60px; animation:spin 1s linear infinite; margin:20px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    p.note { color:#636e72; font-size:14px; margin-top:5px; }
+  </style>
+  <script>
+    async function runTask() {
+      try {
+        const payload = {
+          cmd: JSON.parse(document.getElementById("cmd_json").textContent),
+          action: "{{ action }}"
+        };
+        const res = await fetch("/run_task", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        if (data.status === "done") {
+          document.body.innerHTML = data.html;
+        } else {
+          document.body.innerHTML = "<h3>Error:</h3><pre>" + data.stderr + "</pre>";
+        }
+      } catch(err) {
+        console.error("Network or JSON error:", err);
+        document.body.innerHTML = "<h3>Network or JSON error:</h3><pre>" + err + "</pre>";
+      }
+    }
+
+    window.onload = runTask;
+  </script>
+</head>
+<body>
+  <h2><i class="fa fa-gear fa-spin"></i> {{ message }}</h2>
+  <div class="spinner"></div>
+  <p class="note">This may take a few seconds…</p>
+  <pre id="cmd_json" style="display:none;">{{ cmd_json }}</pre>
+</body>
+</html>

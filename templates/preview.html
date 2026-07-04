@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+html, body {
+    margin: 0;
+    height: 100%;
+    background: #0b1220;
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    background: #0b1220;
+}
+
+/* Header */
+
+.page-header {
+    padding: 20px;
+    border-bottom: 1px solid #1e293b;
+    background: #0f172a;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 26px;
+    color: #e2e8f0;
+}
+
+.subtitle {
+    text-align: center;
+    color: #94a3b8;
+    margin-top: 6px;
+    margin-bottom: 18px;
+}
+
+/* Layout */
+
+.preview-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 10px 20px 40px 20px;
+}
+
+.preview-container {
+    width: 100%;
+    max-width: 1100px;
+
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 14px;
+
+    padding: 22px;
+
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.preview {
+    color: #e2e8f0;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+</style>
+
+<div class="page">
+
+<div class="page-header">
+<span style="font-size:24px">📄</span>
+<h1>Preview ML Passages</h1>
+</div>
+
+<div class="subtitle">
+🔍 See the output from your latest Recoll indexing
+</div>
+
+<div class="preview-wrapper">
+
+<div class="preview-container">
+<pre class="preview">{{ text }}</pre>
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

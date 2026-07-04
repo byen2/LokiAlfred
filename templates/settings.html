@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+html, body {
+    margin: 0;
+    height: 100%;
+    background: #0b1220;
+}
+
+.settings-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Header */
+
+.page-header {
+    padding: 20px;
+    border-bottom: 1px solid #1e293b;
+    background: #0f172a;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 26px;
+    color: #e2e8f0;
+}
+
+.subtitle {
+    text-align: center;
+    color: #94a3b8;
+    margin-top: 6px;
+    margin-bottom: 20px;
+}
+
+/* Layout */
+
+.settings-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 10px 20px 30px 20px;
+}
+
+/* Card */
+
+.settings-form {
+    width: 100%;
+    max-width: 650px;
+
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 14px;
+
+    padding: 28px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.settings-form label {
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+.settings-form input {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #1e293b;
+    background: #020617;
+    color: white;
+}
+
+.primary-btn {
+    margin-top: 12px;
+    padding: 14px;
+    background: #2563eb;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+}
+
+.primary-btn:hover {
+    background: #1d4ed8;
+}
+
+.settings-msg {
+    text-align: center;
+    margin-top: 10px;
+}
+
+</style>
+
+<div class="settings-page">
+
+<div class="page-header">
+<span style="font-size:24px">⚙️</span>
+<h1>Recoll Settings</h1>
+</div>
+
+<div class="subtitle">
+🧠 Configure your search & indexing parameters
+</div>
+
+<div class="settings-wrapper">
+
+<form id="settings-form" class="settings-form">
+
+<label>🔎 Search Query</label>
+<input type="text"
+id="query"
+value="{{ (prev_settings or {}).get('query','') }}"
+required>
+
+<label>📁 Index Directories</label>
+<input type="text"
+id="index_dir"
+value="{{ (prev_settings or {}).get('index_dirs','') }}">
+
+<label>📄 Top Documents</label>
+<input type="number"
+id="top_docs"
+value="{{ (prev_settings or {}).get('top_docs',5) }}">
+
+<label>🧠 Top Passages</label>
+<input type="number"
+id="top_passages"
+value="{{ (prev_settings or {}).get('top_passages',3) }}">
+
+<label>📏 Word Radius</label>
+<input type="number"
+id="word_radius"
+value="{{ (prev_settings or {}).get('word_radius',500) }}">
+
+<label>
+<input type="checkbox"
+id="full"
+{% if (prev_settings or {}).get('full') %}checked{% endif %}>
+🔄 Force Full Reindex
+</label>
+
+<button class="primary-btn">
+🚀 Run Search
+</button>
+
+<div id="settings-msg" class="settings-msg"></div>
+
+</form>
+
+</div>
+
+</div>
+
+{% endblock %}
