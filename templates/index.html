@@ -1,0 +1,130 @@
+<!-- THIS IS THE ORIGINAL -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loki Alfred — Local Document Search</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #0984e3;
+      --accent-light: #74b9ff;
+      --bg: #f5f6fa;
+      --text: #2d3436;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      opacity: 0;
+      animation: fadeIn 0.5s ease forwards;
+    }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    .container {
+      max-width: 700px;
+      margin: 60px auto;
+      background: #fff;
+      padding: 40px 30px;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      transition: box-shadow 0.3s ease, transform 0.2s ease;
+    }
+    .container:hover {
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transform: translateY(-3px);
+    }
+    h1 {
+      font-size: 30px;
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+    p.subtitle {
+      margin-top: 0;
+      color: #555;
+      margin-bottom: 25px;
+    }
+
+    label { display: block; margin-top: 15px; font-weight: 600; }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+      transition: border 0.3s ease;
+    }
+    input:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(9,132,227,0.2);
+    }
+    .form-row { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px; }
+    .form-row > div { flex: 1; min-width: 120px; }
+
+    button.primary-btn {
+      margin-top: 25px;
+      padding: 12px 24px;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease, transform 0.1s ease;
+    }
+    button.primary-btn:hover { background-color: var(--accent-light); transform: translateY(-1px); }
+    button.primary-btn:active { transform: translateY(0); }
+
+    .checkbox-label { margin-top: 20px; display: flex; align-items: center; gap: 8px; }
+
+    footer {
+      text-align: center;
+      color: #888;
+      margin-top: 40px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fa-solid fa-magnifying-glass"></i> Loki Alfred</h1>
+    <p class="subtitle">Index documents and ask questions with LLMs</p>
+
+    <form action="/search" method="post">
+      <label for="index_dir"><i class="fa fa-folder-open"></i> Directory to Index</label>
+      <input type="text" id="index_dir" name="index_dir" placeholder="e.g. ~/Desktop/Books">
+
+      <label for="query"><i class="fa fa-search"></i> Search Term</label>
+      <input type="text" id="query" name="query" placeholder="e.g. machine learning" required>
+
+      <div class="form-row">
+        <div>
+          <label for="top_docs">Top Docs</label>
+          <input type="number" id="top_docs" name="top_docs" value="5" min="1">
+        </div>
+        <div>
+          <label for="top_passages">Top Passages</label>
+          <input type="number" id="top_passages" name="top_passages" value="3" min="1">
+        </div>
+        <div>
+          <label for="word_radius">Word Radius</label>
+          <input type="number" id="word_radius" name="word_radius" value="150" min="10" step="10">
+        </div>
+      </div>
+
+      <label class="checkbox-label">
+        <input type="checkbox" name="full"> Force Full Reindex
+      </label>
+
+      <button type="submit" class="primary-btn"><i class="fa fa-play"></i> Run Search</button>
+    </form>
+  </div>
+
+  <footer>© 2026 Loki Alfred — Document Search Assistant</footer>
+</body>
+</html>

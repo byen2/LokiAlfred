@@ -1,0 +1,29 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Rust
+target/
+
+# PyInstaller
+build/
+dist/
+
+# macOS
+.DS_Store
+
+# User data
+history/
+archive/
+settings.json
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log

@@ -1,0 +1,736 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+html, body {
+    height: 100%;
+    margin: 0;
+    background: #0b1220;
+    overflow: hidden;
+}
+
+.chat-layout {
+    display: flex;
+    height: calc(100vh - 60px);
+    background: #0b1220;
+    color: #e2e8f0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+.chat-sidebar {
+    width: 280px;
+    background: #0f172a;
+    border-right: 1px solid #1e293b;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.chat-sidebar h3 {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+#session-count {
+    color: #64748b;
+}
+
+.chat-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.check-all-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #94a3b8;
+    cursor: pointer;
+}
+
+#delete-selected {
+    border: none;
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #7f1d1d;
+    color: white;
+    cursor: pointer;
+}
+
+#delete-selected:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+#chat-list {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 4px;
+}
+
+.chat-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.chat-checkbox {
+    flex: 0 0 auto;
+}
+
+.chat-item {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #cbd5e1;
+    background: transparent;
+    transition: 0.18s ease;
+    border: 1px solid transparent;
+}
+
+.chat-item:hover {
+    background: #111c31;
+    transform: translateX(2px);
+}
+
+.chat-item.active-chat {
+    background: #2563eb;
+    color: white;
+}
+
+#new-chat {
+    margin-top: 12px;
+    padding: 11px 12px;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.18s ease;
+}
+
+#new-chat:hover {
+    background: #1d4ed8;
+}
+
+.chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+.top-header {
+    background: #0f172a;
+    border-bottom: 1px solid #1e293b;
+    padding: 8px 16px;
+}
+
+.header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.top-header h1 {
+    margin: 0;
+    font-size: 18px;
+    color: #f8fafc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.model-label {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.model-select {
+    background: #020617;
+    border: 1px solid #1e293b;
+    color: #e2e8f0;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    min-width: 260px;
+    outline: none;
+}
+
+.page {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+}
+
+#empty-state {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    width: 100%;
+    height: 100%;
+
+    padding-bottom: 90px; /* roughly input bar height */
+    box-sizing: border-box;
+}
+
+.empty-card {
+    width: 520px;
+    max-width: 80%;
+
+    height: 500px;
+
+    background: white;
+    border-radius: 18px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    color: #64748b;
+}
+
+#empty-state .icon {
+    font-size: 42px;
+}
+
+#empty-state .title {
+    font-size: 18px;
+    color: #e2e8f0;
+    font-weight: 700;
+}
+
+#empty-state .subtitle {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+#chat-container {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 18px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+    box-sizing: border-box;
+}
+
+.user-msg,
+.bot-msg {
+    max-width: 72%;
+    padding: 11px 13px;
+    font-size: 14px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.user-msg {
+    align-self: flex-end;
+    background: #2563eb;
+    color: white;
+    border-radius: 14px 14px 2px 14px;
+}
+
+.bot-msg {
+    align-self: flex-start;
+    background: #1e293b;
+    color: #e2e8f0;
+    border-radius: 14px 14px 14px 2px;
+}
+
+.msg-model {
+    font-size: 10.5px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+    opacity: 0.8;
+    font-weight: 600;
+}
+
+
+#input-bar {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid #1e293b;
+    background: #0f172a;
+    flex-shrink: 0;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+#question-input {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1px solid #1e293b;
+    background: #0b1220;
+    color: white;
+    outline: none;
+    font-size: 14px;
+}
+
+#question-input:focus {
+    border-color: #2563eb;
+}
+
+#ask-btn,
+#new-chat-main {
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.18s ease;
+}
+
+#ask-btn {
+    background: #2563eb;
+    color: white;
+}
+
+#ask-btn:hover {
+    background: #1d4ed8;
+}
+
+#new-chat-main {
+    background: #334155;
+    color: white;
+}
+
+#new-chat-main:hover {
+    background: #475569;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #243244;
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+</style>
+
+<div class="chat-layout">
+
+    <div class="chat-sidebar">
+        <h3>💬 Chats (<span id="session-count">0</span>)</h3>
+
+        <div class="chat-actions">
+            <label class="check-all-label">
+                <input type="checkbox" id="check-all-chats">
+                All
+            </label>
+
+            <button id="delete-selected" disabled>Delete</button>
+        </div>
+
+        <div id="chat-list"></div>
+
+        <button id="new-chat">➕ New Chat</button>
+    </div>
+
+    <div class="chat-main">
+
+        <div class="top-header">
+            <div class="header-row">
+                <h1>🤖 Ask Alfred</h1>
+
+                <div class="header-right">
+                    <span class="model-label">Model</span>
+
+                    <select id="model-select" class="model-select">
+                        <option>Loading models...</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="form-card">
+
+                <div id="empty-state">
+
+                    <div class="empty-card">
+                        <div class="icon">💬</div>
+                        <div class="title">Start a conversation</div>
+                        <div class="subtitle">
+                            Choose a model and ask anything below
+                        </div>
+                    </div>
+                
+                </div>
+
+                <div id="chat-container"></div>
+
+                <div id="input-bar">
+                    <input
+                        id="question-input"
+                        placeholder="Ask something..."
+                        autocomplete="off"
+                    />
+
+                    <button id="ask-btn">Ask</button>
+                    <button id="new-chat-main">New</button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script>
+    const chatContainer = document.getElementById("chat-container");
+    const emptyState = document.getElementById("empty-state");
+    const chatList = document.getElementById("chat-list");
+    const input = document.getElementById("question-input");
+    const sessionCount = document.getElementById("session-count");
+    const modelSelect = document.getElementById("model-select");
+    
+    async function loadModels() {
+        try {
+            const resp = await fetch("/ollama_models?_=" + Date.now());
+            const data = await resp.json();
+    
+            modelSelect.innerHTML = "";
+    
+            if (data.error) {
+                modelSelect.innerHTML = `<option>${data.error}</option>`;
+                return;
+            }
+    
+            if (!data.models || data.models.length === 0) {
+                modelSelect.innerHTML = "<option>No models found</option>";
+                return;
+            }
+    
+            data.models.forEach(model => {
+                const opt = document.createElement("option");
+                opt.value = model;
+                opt.textContent = "🤖 " + model;
+                modelSelect.appendChild(opt);
+            });
+    
+            modelSelect.value = data.models.includes("phi4:latest")
+                ? "phi4:latest"
+                : data.models[0];
+    
+        } catch {
+            modelSelect.innerHTML = "<option>Error loading models</option>";
+        }
+    }
+    
+    function showChat() {
+        emptyState.style.display = "none";
+        chatContainer.style.display = "flex";
+    }
+    
+    function showEmpty() {
+        if (chatContainer.children.length === 0) {
+            chatContainer.style.display = "none";
+            emptyState.style.display = "flex";
+        }
+    }
+    
+    function scrollBottom() {
+        setTimeout(() => {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }, 0);
+    }
+    
+    function renderMarkdown(text) {
+        if (window.marked && window.DOMPurify) {
+            return DOMPurify.sanitize(marked.parse(text || ""));
+        }
+    
+        const escaped = document.createElement("div");
+        escaped.textContent = text || "";
+        return escaped.innerHTML;
+    }
+    
+    function appendChat(role, text, model = null, shouldScroll = true) {
+        if (chatContainer.style.display !== "flex") {
+            showChat();
+        }
+    
+        const div = document.createElement("div");
+        div.className = role === "user" ? "user-msg" : "bot-msg";
+    
+        if (role === "bot") {
+            if (model) {
+                const label = document.createElement("div");
+                label.className = "msg-model";
+                label.textContent = "Answered by " + model;
+                div.appendChild(label);
+            }
+    
+            const body = document.createElement("div");
+            body.className = "markdown-body";
+            body.innerHTML = renderMarkdown(text);
+            div.appendChild(body);
+        } else {
+            div.textContent = text || "";
+        }
+    
+        chatContainer.appendChild(div);
+    
+        if (shouldScroll) {
+            scrollBottom();
+        }
+    }
+    
+    function getCheckedChats() {
+        return Array.from(document.querySelectorAll(".chat-checkbox:checked"))
+            .map(cb => cb.value);
+    }
+    
+    function updateDeleteButtonState() {
+        document.getElementById("delete-selected").disabled =
+            getCheckedChats().length === 0;
+    }
+    
+    async function loadChats() {
+        const resp = await fetch("/chat_sessions");
+        const data = await resp.json();
+    
+        chatList.innerHTML = "";
+        sessionCount.innerText = data.count || 0;
+    
+        document.getElementById("check-all-chats").checked = false;
+        document.getElementById("delete-selected").disabled = true;
+    
+        data.sessions.forEach(chat => {
+            const row = document.createElement("div");
+            row.className = "chat-row";
+    
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.className = "chat-checkbox";
+            checkbox.value = chat.file;
+            checkbox.addEventListener("change", updateDeleteButtonState);
+    
+            const div = document.createElement("div");
+            div.className = "chat-item";
+            div.innerText = chat.preview;
+    
+            div.onclick = async () => {
+                const resp = await fetch("/switch_chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ file: chat.file })
+                });
+    
+                const session = await resp.json();
+    
+                if (session.model) {
+                    modelSelect.value = session.model;
+                }
+    
+                chatContainer.innerHTML = "";
+    
+                if (session.history.length > 0) {
+                    showChat();
+                    session.history.forEach(m => {
+                        appendChat(m.role, m.content, m.model, false);
+                    });
+                    chatContainer.scrollTop = 0;
+                } else {
+                    showEmpty();
+                }
+    
+                document.querySelectorAll(".chat-item").forEach(item => {
+                    item.classList.remove("active-chat");
+                });
+    
+                div.classList.add("active-chat");
+            };
+    
+            row.appendChild(checkbox);
+            row.appendChild(div);
+            chatList.appendChild(row);
+        });
+    }
+    
+    document.getElementById("check-all-chats").addEventListener("change", function () {
+        document.querySelectorAll(".chat-checkbox").forEach(cb => {
+            cb.checked = this.checked;
+        });
+    
+        updateDeleteButtonState();
+    });
+    
+    document.getElementById("delete-selected").addEventListener("click", async () => {
+        const selected = getCheckedChats();
+    
+        if (selected.length === 0) return;
+    
+        const resp = await fetch("/delete_chats", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ files: selected })
+        });
+    
+        const result = await resp.json();
+        console.log("delete result:", result);
+    
+        chatContainer.innerHTML = "";
+        showEmpty();
+    
+        document.getElementById("check-all-chats").checked = false;
+        document.getElementById("delete-selected").disabled = true;
+    
+        await loadChats();
+    });
+    
+    async function askQuestion() {
+        const q = input.value.trim();
+    
+        if (!q) return;
+    
+        const model = modelSelect.value;
+    
+        appendChat("user", q);
+        input.value = "";
+    
+        appendChat("bot", "Thinking...", model);
+    
+        try {
+            const resp = await fetch("/ask_ollama", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    question: q,
+                    model: model
+                })
+            });
+    
+            const data = await resp.json();
+    
+            const lastMsg = chatContainer.lastElementChild;
+            if (lastMsg && lastMsg.classList.contains("bot-msg")) {
+                lastMsg.remove();
+            }
+    
+            if (!resp.ok || data.error) {
+                appendChat("bot", data.error || "Error generating response.", model);
+                return;
+            }
+    
+            appendChat("bot", data.answer, data.model || model);
+            await loadChats();
+    
+        } catch (err) {
+            const lastMsg = chatContainer.lastElementChild;
+            if (lastMsg && lastMsg.classList.contains("bot-msg")) {
+                lastMsg.remove();
+            }
+    
+            appendChat("bot", "Error connecting to backend.", model);
+        }
+    }
+    
+    document.getElementById("ask-btn").onclick = askQuestion;
+    
+    input.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            askQuestion();
+        }
+    });
+    
+    async function newChat() {
+        await fetch("/clear_chat", { method: "POST" });
+    
+        chatContainer.innerHTML = "";
+        showEmpty();
+        await loadChats();
+    }
+    
+    document.getElementById("new-chat").onclick = newChat;
+    document.getElementById("new-chat-main").onclick = newChat;
+    
+    async function init() {
+        await loadModels();
+        await loadChats();
+    
+        const resp = await fetch("/chat_history");
+        const data = await resp.json();
+    
+        if (data.model) {
+            modelSelect.value = data.model;
+        }
+    
+        if (data.history && data.history.length > 0) {
+            showChat();
+    
+            data.history.forEach(m => {
+                appendChat(m.role, m.content, m.model, false);
+            });
+    
+            chatContainer.scrollTop = 0;
+        } else {
+            showEmpty();
+        }
+    }
+    
+    window.addEventListener("DOMContentLoaded", init);
+    </script>
+
+{% endblock %}
