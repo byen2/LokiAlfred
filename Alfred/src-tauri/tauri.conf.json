@@ -25,8 +25,8 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "resources":[
-       "bin/backend"
+    "externalBin":[
+       "binaries/backend"
     ],
     "icon": [
       "icons/32x32.png",

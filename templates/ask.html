@@ -4,6 +4,7 @@
 
 <style>
 html, body {
+    width: 100%;
     height: 100%;
     margin: 0;
     background: #0b1220;
@@ -11,15 +12,22 @@ html, body {
 }
 
 .chat-layout {
+    flex: 1;
     display: flex;
-    height: calc(100vh - 60px);
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    margin-top: 0;
+    overflow: hidden;
     background: #0b1220;
     color: #e2e8f0;
     font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
 }
 
+/* SIDEBAR */
 .chat-sidebar {
     width: 280px;
+    flex: 0 0 280px;
     background: #0f172a;
     border-right: 1px solid #1e293b;
     display: flex;
@@ -113,6 +121,7 @@ html, body {
 
 #new-chat {
     margin-top: 12px;
+    margin-bottom: 12px;
     padding: 11px 12px;
     border: none;
     border-radius: 10px;
@@ -127,18 +136,23 @@ html, body {
     background: #1d4ed8;
 }
 
+/* MAIN */
 .chat-main {
-    flex: 1;
+    flex: 1 1 0;
+    width: 100%;
+    max-width: none;
     display: flex;
     flex-direction: column;
     min-width: 0;
     min-height: 0;
+    overflow: hidden;
 }
 
 .top-header {
     background: #0f172a;
     border-bottom: 1px solid #1e293b;
     padding: 8px 16px;
+    flex-shrink: 0;
 }
 
 .header-row {
@@ -175,123 +189,219 @@ html, body {
     padding: 7px 10px;
     border-radius: 8px;
     font-size: 12px;
-    min-width: 260px;
+    min-width: 0;
+    width: min(260px, 45vw);
     outline: none;
 }
 
-.page {
-    flex: 1;
+.chat-page {
+    flex: 1 1 auto;
     display: flex;
+    min-width: 0;
     min-height: 0;
-    height: 100%;
-    align-items: center;
-    justify-content: center;
+    width: 100%;
+    max-width: none;
+    overflow: hidden;
+
+    padding-right: 12px;
+    box-sizing: border-box;
 }
 
 .form-card {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
     display: flex;
     flex-direction: column;
     min-height: 0;
-    height: 100%;
+    width: 100%;
+    background: #0b1220;
+    padding: 0;
+    margin: 0;
+}
+
+/* CHAT AREA */
+#empty-state,
+#chat-container {
+    flex: 1;
+    width: 100%;
+    max-width: none;
+    min-height: 0;
+    box-sizing: border-box;
 }
 
 #empty-state {
     flex: 1;
-
     display: flex;
-    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
 
-    align-items: center;
-    justify-content: center;
+    width: auto;
+    max-width: none;
 
-    text-align: center;
+    margin: 8px 16px 12px 12px;
+    padding: 0;
 
-    width: 100%;
-    height: 100%;
-
-    padding-bottom: 90px; /* roughly input bar height */
     box-sizing: border-box;
 }
 
 .empty-card {
-    width: 520px;
-    max-width: 80%;
-
-    height: 500px;
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    max-width: none;
 
     background: white;
-    border-radius: 18px;
+    border-radius: 14px;
 
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
-    color: #64748b;
 }
 
 #empty-state .icon {
     font-size: 42px;
+    margin-bottom: 10px;
 }
 
 #empty-state .title {
-    font-size: 18px;
+    font-size: 20px;
     color: #e2e8f0;
     font-weight: 700;
 }
 
 #empty-state .subtitle {
     font-size: 13px;
-    opacity: 0.8;
+    color: #94a3b8;
+    margin-top: 6px;
 }
 
+/* This is the white area */
 #chat-container {
     flex: 1;
     display: none;
     flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    padding: 18px;
+    gap: 14px;
+
+    width: auto;
+    max-width: none;
+    margin: 8px 0 12px 12px;
+    padding: 20px 28px;
+
+    box-sizing: border-box;
     overflow-y: auto;
     overflow-x: hidden;
-    min-height: 0;
-    box-sizing: border-box;
+
+    background: #ffffff;
+    border-radius: 14px;
 }
 
+/* message rows fill the white area */
 .user-msg,
 .bot-msg {
-    max-width: 72%;
-    padding: 11px 13px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0;
     font-size: 14px;
-    line-height: 1.45;
-    white-space: pre-wrap;
+    line-height: 1.6;
+    white-space: normal;
     word-wrap: break-word;
+    align-self: stretch;
+    background: transparent;
+    border: none;
+    box-shadow: none;
 }
 
+/* user bubble */
 .user-msg {
-    align-self: flex-end;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.user-msg::before {
+    content: attr(data-text);
+    display: block;
+    max-width: 70%;
     background: #2563eb;
     color: white;
-    border-radius: 14px 14px 2px 14px;
+    padding: 12px 14px;
+    border-radius: 18px 18px 4px 18px;
 }
 
-.bot-msg {
-    align-self: flex-start;
-    background: #1e293b;
-    color: #e2e8f0;
-    border-radius: 14px 14px 14px 2px;
+/* assistant response */
+.bot-msg .markdown-body {
+    max-width: 75%;
+    background: #e2e8f0;
+    color: #1e293b;
+    padding: 12px 14px;
+    border-radius: 18px 18px 18px 4px;
 }
 
+.bot-msg .markdown-body,
+.bot-msg .markdown-body p,
+.bot-msg .markdown-body li,
+.bot-msg .markdown-body strong,
+.bot-msg .markdown-body em {
+    color: #1e293b;
+    opacity: 1;
+}
+
+/* model label */
 .msg-model {
-    font-size: 10.5px;
-    color: #94a3b8;
+    width: fit-content;
+    max-width: 75%;
+    font-size: 11px;
+    color: #64748b;
     margin-bottom: 6px;
-    opacity: 0.8;
     font-weight: 600;
+    opacity: 1;
 }
 
+/* markdown */
+.markdown-body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
 
+.markdown-body p {
+    margin: 0 0 12px;
+}
+
+.markdown-body p:last-child {
+    margin-bottom: 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+    margin: 8px 0 12px 22px;
+    padding: 0;
+}
+
+.markdown-body li {
+    margin: 5px 0;
+}
+
+.markdown-body code {
+    background: #e5e7eb;
+    color: #111827;
+    padding: 2px 5px;
+    border-radius: 5px;
+}
+
+.markdown-body pre {
+    background: #111827;
+    color: #e5e7eb;
+    padding: 14px;
+    border-radius: 12px;
+    overflow-x: auto;
+}
+
+/* INPUT BAR */
 #input-bar {
     display: flex;
     gap: 8px;
@@ -319,8 +429,7 @@ html, body {
     border-color: #2563eb;
 }
 
-#ask-btn,
-#new-chat-main {
+#ask-btn{
     border: none;
     cursor: pointer;
     border-radius: 10px;
@@ -341,46 +450,39 @@ html, body {
     background: #1d4ed8;
 }
 
-#new-chat-main {
-    background: #334155;
-    color: white;
-}
-
-#new-chat-main:hover {
-    background: #475569;
-}
-
+/* SCROLLBAR */
 ::-webkit-scrollbar {
     width: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #243244;
+    background: #cbd5e1;
     border-radius: 20px;
 }
 
 ::-webkit-scrollbar-track {
     background: transparent;
 }
+
 </style>
 
 <div class="chat-layout">
 
     <div class="chat-sidebar">
         <h3>💬 Chats (<span id="session-count">0</span>)</h3>
-
+    
+        <button id="new-chat">➕ New Chat</button>
+    
         <div class="chat-actions">
             <label class="check-all-label">
                 <input type="checkbox" id="check-all-chats">
                 All
             </label>
-
+    
             <button id="delete-selected" disabled>Delete</button>
         </div>
-
+    
         <div id="chat-list"></div>
-
-        <button id="new-chat">➕ New Chat</button>
     </div>
 
     <div class="chat-main">
@@ -399,11 +501,10 @@ html, body {
             </div>
         </div>
 
-        <div class="page">
+        <div class="chat-page">
             <div class="form-card">
 
                 <div id="empty-state">
-
                     <div class="empty-card">
                         <div class="icon">💬</div>
                         <div class="title">Start a conversation</div>
@@ -411,7 +512,6 @@ html, body {
                             Choose a model and ask anything below
                         </div>
                     </div>
-                
                 </div>
 
                 <div id="chat-container"></div>
@@ -424,7 +524,6 @@ html, body {
                     />
 
                     <button id="ask-btn">Ask</button>
-                    <button id="new-chat-main">New</button>
                 </div>
 
             </div>
@@ -437,300 +536,299 @@ html, body {
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <script>
-    const chatContainer = document.getElementById("chat-container");
-    const emptyState = document.getElementById("empty-state");
-    const chatList = document.getElementById("chat-list");
-    const input = document.getElementById("question-input");
-    const sessionCount = document.getElementById("session-count");
-    const modelSelect = document.getElementById("model-select");
-    
-    async function loadModels() {
-        try {
-            const resp = await fetch("/ollama_models?_=" + Date.now());
-            const data = await resp.json();
-    
-            modelSelect.innerHTML = "";
-    
-            if (data.error) {
-                modelSelect.innerHTML = `<option>${data.error}</option>`;
-                return;
-            }
-    
-            if (!data.models || data.models.length === 0) {
-                modelSelect.innerHTML = "<option>No models found</option>";
-                return;
-            }
-    
-            data.models.forEach(model => {
-                const opt = document.createElement("option");
-                opt.value = model;
-                opt.textContent = "🤖 " + model;
-                modelSelect.appendChild(opt);
-            });
-    
-            modelSelect.value = data.models.includes("phi4:latest")
-                ? "phi4:latest"
-                : data.models[0];
-    
-        } catch {
-            modelSelect.innerHTML = "<option>Error loading models</option>";
-        }
-    }
-    
-    function showChat() {
-        emptyState.style.display = "none";
-        chatContainer.style.display = "flex";
-    }
-    
-    function showEmpty() {
-        if (chatContainer.children.length === 0) {
-            chatContainer.style.display = "none";
-            emptyState.style.display = "flex";
-        }
-    }
-    
-    function scrollBottom() {
-        setTimeout(() => {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }, 0);
-    }
-    
-    function renderMarkdown(text) {
-        if (window.marked && window.DOMPurify) {
-            return DOMPurify.sanitize(marked.parse(text || ""));
-        }
-    
-        const escaped = document.createElement("div");
-        escaped.textContent = text || "";
-        return escaped.innerHTML;
-    }
-    
-    function appendChat(role, text, model = null, shouldScroll = true) {
-        if (chatContainer.style.display !== "flex") {
-            showChat();
-        }
-    
-        const div = document.createElement("div");
-        div.className = role === "user" ? "user-msg" : "bot-msg";
-    
-        if (role === "bot") {
-            if (model) {
-                const label = document.createElement("div");
-                label.className = "msg-model";
-                label.textContent = "Answered by " + model;
-                div.appendChild(label);
-            }
-    
-            const body = document.createElement("div");
-            body.className = "markdown-body";
-            body.innerHTML = renderMarkdown(text);
-            div.appendChild(body);
-        } else {
-            div.textContent = text || "";
-        }
-    
-        chatContainer.appendChild(div);
-    
-        if (shouldScroll) {
-            scrollBottom();
-        }
-    }
-    
-    function getCheckedChats() {
-        return Array.from(document.querySelectorAll(".chat-checkbox:checked"))
-            .map(cb => cb.value);
-    }
-    
-    function updateDeleteButtonState() {
-        document.getElementById("delete-selected").disabled =
-            getCheckedChats().length === 0;
-    }
-    
-    async function loadChats() {
-        const resp = await fetch("/chat_sessions");
+const chatContainer = document.getElementById("chat-container");
+const emptyState = document.getElementById("empty-state");
+const chatList = document.getElementById("chat-list");
+const input = document.getElementById("question-input");
+const sessionCount = document.getElementById("session-count");
+const modelSelect = document.getElementById("model-select");
+
+async function loadModels() {
+    try {
+        const resp = await fetch("/ollama_models?_=" + Date.now());
         const data = await resp.json();
-    
-        chatList.innerHTML = "";
-        sessionCount.innerText = data.count || 0;
-    
-        document.getElementById("check-all-chats").checked = false;
-        document.getElementById("delete-selected").disabled = true;
-    
-        data.sessions.forEach(chat => {
-            const row = document.createElement("div");
-            row.className = "chat-row";
-    
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.className = "chat-checkbox";
-            checkbox.value = chat.file;
-            checkbox.addEventListener("change", updateDeleteButtonState);
-    
-            const div = document.createElement("div");
-            div.className = "chat-item";
-            div.innerText = chat.preview;
-    
-            div.onclick = async () => {
-                const resp = await fetch("/switch_chat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ file: chat.file })
-                });
-    
-                const session = await resp.json();
-    
-                if (session.model) {
-                    modelSelect.value = session.model;
-                }
-    
-                chatContainer.innerHTML = "";
-    
-                if (session.history.length > 0) {
-                    showChat();
-                    session.history.forEach(m => {
-                        appendChat(m.role, m.content, m.model, false);
-                    });
-                    chatContainer.scrollTop = 0;
-                } else {
-                    showEmpty();
-                }
-    
-                document.querySelectorAll(".chat-item").forEach(item => {
-                    item.classList.remove("active-chat");
-                });
-    
-                div.classList.add("active-chat");
-            };
-    
-            row.appendChild(checkbox);
-            row.appendChild(div);
-            chatList.appendChild(row);
+
+        modelSelect.innerHTML = "";
+
+        if (data.error) {
+            modelSelect.innerHTML = `<option>${data.error}</option>`;
+            return;
+        }
+
+        if (!data.models || data.models.length === 0) {
+            modelSelect.innerHTML = "<option>No models found</option>";
+            return;
+        }
+
+        data.models.forEach(model => {
+            const opt = document.createElement("option");
+            opt.value = model;
+            opt.textContent = "🤖 " + model;
+            modelSelect.appendChild(opt);
         });
+
+        modelSelect.value = data.models.includes("phi4:latest")
+            ? "phi4:latest"
+            : data.models[0];
+
+    } catch {
+        modelSelect.innerHTML = "<option>Error loading models</option>";
     }
-    
-    document.getElementById("check-all-chats").addEventListener("change", function () {
-        document.querySelectorAll(".chat-checkbox").forEach(cb => {
-            cb.checked = this.checked;
-        });
-    
-        updateDeleteButtonState();
-    });
-    
-    document.getElementById("delete-selected").addEventListener("click", async () => {
-        const selected = getCheckedChats();
-    
-        if (selected.length === 0) return;
-    
-        const resp = await fetch("/delete_chats", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ files: selected })
-        });
-    
-        const result = await resp.json();
-        console.log("delete result:", result);
-    
-        chatContainer.innerHTML = "";
-        showEmpty();
-    
-        document.getElementById("check-all-chats").checked = false;
-        document.getElementById("delete-selected").disabled = true;
-    
-        await loadChats();
-    });
-    
-    async function askQuestion() {
-        const q = input.value.trim();
-    
-        if (!q) return;
-    
-        const model = modelSelect.value;
-    
-        appendChat("user", q);
-        input.value = "";
-    
-        appendChat("bot", "Thinking...", model);
-    
-        try {
-            const resp = await fetch("/ask_ollama", {
+}
+
+function showChat() {
+    emptyState.style.display = "none";
+    chatContainer.style.display = "flex";
+}
+
+function showEmpty() {
+    if (chatContainer.children.length === 0) {
+        chatContainer.style.display = "none";
+        emptyState.style.display = "flex";
+    }
+}
+
+function scrollBottom() {
+    setTimeout(() => {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }, 0);
+}
+
+function renderMarkdown(text) {
+    if (window.marked && window.DOMPurify) {
+        return DOMPurify.sanitize(marked.parse(text || ""));
+    }
+
+    const escaped = document.createElement("div");
+    escaped.textContent = text || "";
+    return escaped.innerHTML;
+}
+
+function appendChat(role, text, model = null, shouldScroll = true) {
+    if (chatContainer.style.display !== "flex") {
+        showChat();
+    }
+
+    const div = document.createElement("div");
+    div.className = role === "user" ? "user-msg" : "bot-msg";
+
+    if (role === "bot") {
+        if (model) {
+            const label = document.createElement("div");
+            label.className = "msg-model";
+            label.textContent = "Answered by " + model;
+            div.appendChild(label);
+        }
+
+        const body = document.createElement("div");
+        body.className = "markdown-body";
+        body.innerHTML = renderMarkdown(text);
+        div.appendChild(body);
+    } else {
+        div.setAttribute("data-text", text || "");
+    }
+
+    chatContainer.appendChild(div);
+
+    if (shouldScroll) {
+        scrollBottom();
+    }
+}
+
+function getCheckedChats() {
+    return Array.from(document.querySelectorAll(".chat-checkbox:checked"))
+        .map(cb => cb.value);
+}
+
+function updateDeleteButtonState() {
+    document.getElementById("delete-selected").disabled =
+        getCheckedChats().length === 0;
+}
+
+async function loadChats() {
+    const resp = await fetch("/chat_sessions");
+    const data = await resp.json();
+
+    chatList.innerHTML = "";
+    sessionCount.innerText = data.count || 0;
+
+    document.getElementById("check-all-chats").checked = false;
+    document.getElementById("delete-selected").disabled = true;
+
+    data.sessions.forEach(chat => {
+        const row = document.createElement("div");
+        row.className = "chat-row";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "chat-checkbox";
+        checkbox.value = chat.file;
+        checkbox.addEventListener("change", updateDeleteButtonState);
+
+        const div = document.createElement("div");
+        div.className = "chat-item";
+        div.innerText = chat.preview;
+
+        div.onclick = async () => {
+            const resp = await fetch("/switch_chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    question: q,
-                    model: model
-                })
+                body: JSON.stringify({ file: chat.file })
             });
-    
-            const data = await resp.json();
-    
-            const lastMsg = chatContainer.lastElementChild;
-            if (lastMsg && lastMsg.classList.contains("bot-msg")) {
-                lastMsg.remove();
+
+            const session = await resp.json();
+
+            if (session.model) {
+                modelSelect.value = session.model;
             }
-    
-            if (!resp.ok || data.error) {
-                appendChat("bot", data.error || "Error generating response.", model);
-                return;
+
+            chatContainer.innerHTML = "";
+
+            if (session.history.length > 0) {
+                showChat();
+                session.history.forEach(m => {
+                    appendChat(m.role, m.content, m.model, false);
+                });
+                chatContainer.scrollTop = 0;
+            } else {
+                showEmpty();
             }
-    
-            appendChat("bot", data.answer, data.model || model);
-            await loadChats();
-    
-        } catch (err) {
-            const lastMsg = chatContainer.lastElementChild;
-            if (lastMsg && lastMsg.classList.contains("bot-msg")) {
-                lastMsg.remove();
-            }
-    
-            appendChat("bot", "Error connecting to backend.", model);
-        }
-    }
-    
-    document.getElementById("ask-btn").onclick = askQuestion;
-    
-    input.addEventListener("keydown", function(e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            askQuestion();
-        }
+
+            document.querySelectorAll(".chat-item").forEach(item => {
+                item.classList.remove("active-chat");
+            });
+
+            div.classList.add("active-chat");
+        };
+
+        row.appendChild(checkbox);
+        row.appendChild(div);
+        chatList.appendChild(row);
     });
-    
-    async function newChat() {
-        await fetch("/clear_chat", { method: "POST" });
-    
-        chatContainer.innerHTML = "";
-        showEmpty();
-        await loadChats();
-    }
-    
-    document.getElementById("new-chat").onclick = newChat;
-    document.getElementById("new-chat-main").onclick = newChat;
-    
-    async function init() {
-        await loadModels();
-        await loadChats();
-    
-        const resp = await fetch("/chat_history");
+}
+
+document.getElementById("check-all-chats").addEventListener("change", function () {
+    document.querySelectorAll(".chat-checkbox").forEach(cb => {
+        cb.checked = this.checked;
+    });
+
+    updateDeleteButtonState();
+});
+
+document.getElementById("delete-selected").addEventListener("click", async () => {
+    const selected = getCheckedChats();
+
+    if (selected.length === 0) return;
+
+    const resp = await fetch("/delete_chats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ files: selected })
+    });
+
+    const result = await resp.json();
+    console.log("delete result:", result);
+
+    chatContainer.innerHTML = "";
+    showEmpty();
+
+    document.getElementById("check-all-chats").checked = false;
+    document.getElementById("delete-selected").disabled = true;
+
+    await loadChats();
+});
+
+async function askQuestion() {
+    const q = input.value.trim();
+
+    if (!q) return;
+
+    const model = modelSelect.value;
+
+    appendChat("user", q);
+    input.value = "";
+
+    appendChat("bot", "Thinking...", model);
+
+    try {
+        const resp = await fetch("/ask_ollama", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                question: q,
+                model: model
+            })
+        });
+
         const data = await resp.json();
-    
-        if (data.model) {
-            modelSelect.value = data.model;
+
+        const lastMsg = chatContainer.lastElementChild;
+        if (lastMsg && lastMsg.classList.contains("bot-msg")) {
+            lastMsg.remove();
         }
-    
-        if (data.history && data.history.length > 0) {
-            showChat();
-    
-            data.history.forEach(m => {
-                appendChat(m.role, m.content, m.model, false);
-            });
-    
-            chatContainer.scrollTop = 0;
-        } else {
-            showEmpty();
+
+        if (!resp.ok || data.error) {
+            appendChat("bot", data.error || "Error generating response.", model);
+            return;
         }
+
+        appendChat("bot", data.answer, data.model || model);
+        await loadChats();
+
+    } catch (err) {
+        const lastMsg = chatContainer.lastElementChild;
+        if (lastMsg && lastMsg.classList.contains("bot-msg")) {
+            lastMsg.remove();
+        }
+
+        appendChat("bot", "Error connecting to backend.", model);
     }
-    
-    window.addEventListener("DOMContentLoaded", init);
-    </script>
+}
+
+document.getElementById("ask-btn").onclick = askQuestion;
+
+input.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        askQuestion();
+    }
+});
+
+async function newChat() {
+    await fetch("/clear_chat", { method: "POST" });
+
+    chatContainer.innerHTML = "";
+    showEmpty();
+    await loadChats();
+}
+
+document.getElementById("new-chat").onclick = newChat;
+
+async function init() {
+    await loadModels();
+    await loadChats();
+
+    const resp = await fetch("/chat_history");
+    const data = await resp.json();
+
+    if (data.model) {
+        modelSelect.value = data.model;
+    }
+
+    if (data.history && data.history.length > 0) {
+        showChat();
+
+        data.history.forEach(m => {
+            appendChat(m.role, m.content, m.model, false);
+        });
+
+        chatContainer.scrollTop = 0;
+    } else {
+        showEmpty();
+    }
+}
+
+window.addEventListener("DOMContentLoaded", init);
+</script>
 
 {% endblock %}

@@ -2,7 +2,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::{
-    process::{Command, Stdio},
     sync::Mutex,
     thread,
     time::Duration,
@@ -16,19 +15,26 @@ use tauri::{
     WindowEvent,
 };
 
-struct BackendProcess(Mutex<Option<std::process::Child>>);
+use tauri_plugin_shell::ShellExt;
+
+struct BackendProcess(
+    Mutex<Option<tauri_plugin_shell::process::CommandChild>>
+);
 
 fn wait_for_backend() {
-    for _ in 0..50 {
+    for _ in 0..100 {
         if TcpStream::connect("127.0.0.1:8001").is_ok() {
             return;
         }
         thread::sleep(Duration::from_millis(100));
     }
+
+    eprintln!("Backend did not start within timeout.");
 }
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
         .manage(BackendProcess(Mutex::new(None)))
 
         .setup(|app| {
@@ -36,24 +42,16 @@ fn main() {
             // -------------------------
             // START UVICORN
             // -------------------------
-            let child = Command::new("/Users/benoityen/.pyenv/shims/python3")
-                .args([
-                    "-m",
-                    "uvicorn",
-                    "app:app",
-                    "--host",
-                    "127.0.0.1",
-                    "--port",
-                    "8001",
-                ])
-                .current_dir("/Users/benoityen/Desktop/recoll_demo")
-                .stdout(Stdio::inherit())
-                .stderr(Stdio::inherit())
-                .spawn()
-                .expect("failed to start backend");
-
+            let sidecar = app
+                .shell()
+                .sidecar("backend")?;
+            
+            let (_rx, child) = sidecar.spawn()?;
+            
             let state = app.state::<BackendProcess>();
             *state.0.lock().unwrap() = Some(child);
+
+            println!("Backend sidecar started.");
 
             // -------------------------
             // TRAY MENU
@@ -76,7 +74,7 @@ fn main() {
 
                         "quit" => {
                             if let Some(state) = app.try_state::<BackendProcess>() {
-                                if let Some(mut child) = state.0.lock().unwrap().take() {
+                                if let Some(child) = state.0.lock().unwrap().take() {
                                     let _ = child.kill();
                                 }
                             }

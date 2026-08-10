@@ -27,3 +27,6 @@ settings.json
 
 # Logs
 *.log
+
+# Folders
+Alfred/src-tauri/binaries/
