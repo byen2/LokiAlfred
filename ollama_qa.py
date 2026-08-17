@@ -7,8 +7,6 @@ import textwrap
 #https://ollama.com/library/gpt-oss
 #https://ollama.com/library/gemma3
 
-#turn output into streaming
-
 # ---------- CONFIG ----------
 OLLAMA_URL = "http://localhost:11434/api/generate"
 DEFAULT_MODEL = "phi4"   # or "mistral", "phi3", etc.
