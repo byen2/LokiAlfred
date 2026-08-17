@@ -18,19 +18,16 @@ from starlette.templating import Jinja2Templates
 from starlette.staticfiles import StaticFiles
 
 
-#reload page for dropdown menu
 # =========================
 # PATHS
 # =========================
 
 def find_ollama():
 
-    # Standard PATH
     path = shutil.which("ollama")
     if path:
         return path
 
-    # Common macOS locations
     candidates = [
         "/opt/homebrew/bin/ollama",
         "/usr/local/bin/ollama",
@@ -110,10 +107,6 @@ def clean_ollama(text: str) -> str:
         cleaned.append(buffer.strip())
 
     text = "\n".join(cleaned)
-
-    # Fix terminal-wrap duplicated prefixes:
-    # "Sof Software" -> "Software"
-    # "pre preparation" -> "preparation"
     text = re.sub(
         r"\b([A-Za-z]{2,})\s+([A-Za-z]{3,})\b",
         lambda m: m.group(2)
@@ -122,7 +115,6 @@ def clean_ollama(text: str) -> str:
         text
     )
 
-    # Collapse excessive blank lines
     text = re.sub(r"\n{3,}", "\n\n", text)
 
     return text.strip()
@@ -149,11 +141,9 @@ OLD_SETTINGS = BASE_DIR / "settings.json"
 OLD_HISTORY = BASE_DIR / "history"
 OLD_ARCHIVE = BASE_DIR / "archive"
 
-# Copy settings.json
 if not SETTINGS_FILE.exists() and OLD_SETTINGS.exists():
     shutil.copy2(OLD_SETTINGS, SETTINGS_FILE)
 
-# Copy history/
 if not any(HISTORY_DIR.iterdir()) and OLD_HISTORY.exists():
     shutil.copytree(
         OLD_HISTORY,
@@ -161,7 +151,6 @@ if not any(HISTORY_DIR.iterdir()) and OLD_HISTORY.exists():
         dirs_exist_ok=True
     )
 
-# Copy archive/
 if not any(ARCHIVE_DIR.iterdir()) and OLD_ARCHIVE.exists():
     shutil.copytree(
         OLD_ARCHIVE,
@@ -418,10 +407,6 @@ async def chat_sessions(request):
             except:
                 continue
 
-    #print("HISTORY_DIR:", HISTORY_DIR)
-    #print("ARCHIVE_DIR:", ARCHIVE_DIR)
-    #print("history files:", list(HISTORY_DIR.rglob("*.json")))
-
     scan(HISTORY_DIR)
     scan(ARCHIVE_DIR)
 
@@ -493,26 +478,26 @@ async def ask_ollama(request):
     context = session["search_result"]
 
     prompt = f"""
-You are Alfred, a concise desktop AI assistant.
+        You are Alfred, a concise desktop AI assistant.
 
-Formatting rules:
-- Answer in clean Markdown.
-- Use short paragraphs.
-- Use bullets when helpful.
-- Use fenced code blocks for code.
-- Do not output hidden reasoning.
-- Do not write "Thinking..." or "done thinking."
-- Do not explain your reasoning process.
-- Only provide the final answer.
+        Formatting rules:
+        - Answer in clean Markdown.
+        - Use short paragraphs.
+        - Use bullets when helpful.
+        - Use fenced code blocks for code.
+        - Do not output hidden reasoning.
+        - Do not write "Thinking..." or "done thinking."
+        - Do not explain your reasoning process.
+        - Only provide the final answer.
 
-Context:
-{context}
+        Context:
+        {context}
 
-Question:
-{question}
+        Question:
+        {question}
 
-Answer:
-"""
+        Answer:
+        """
 
     append_message(CURRENT_SESSION, "user", question)
 
