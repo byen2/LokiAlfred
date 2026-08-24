@@ -1,0 +1,6 @@
+starlette==0.50.0
+uvicorn==0.38.0
+Jinja2==3.1.6
+requests==2.32.3
+PyMuPDF
+pyinstaller==6.20.0
