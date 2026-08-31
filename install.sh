@@ -2,19 +2,33 @@
 
 set -euo pipefail
 
+# ============================================================
+# Loki Alfred macOS installer
+# ============================================================
+
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TAURI_DIR="$PROJECT_ROOT/Alfred"
 TAURI_SRC="$TAURI_DIR/src-tauri"
 VENV_DIR="$PROJECT_ROOT/.venv"
 
-echo "======================================"
-echo "        Loki Alfred Installer"
-echo "======================================"
 echo
+echo "================================================"
+echo "             Loki Alfred Installer"
+echo "================================================"
+echo
+
+# ============================================================
+# Helpers
+# ============================================================
+
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
 
 ask_yes_no() {
     local prompt="$1"
     local default="${2:-Y}"
+    local reply
 
     if [[ "$default" == "Y" ]]; then
         read -r -p "$prompt [Y/n] " reply
@@ -27,23 +41,57 @@ ask_yes_no() {
     [[ "$reply" =~ ^[Yy]$ ]]
 }
 
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
+success() {
+    echo "✓ $1"
 }
 
-echo "Project root: $PROJECT_ROOT"
-echo
+warning() {
+    echo "⚠ $1"
+}
+
+fail() {
+    echo
+    echo "ERROR: $1"
+    echo
+    exit 1
+}
 
 # ============================================================
 # macOS check
 # ============================================================
 
 if [[ "$(uname -s)" != "Darwin" ]]; then
-    echo "Error: This installer currently supports macOS only."
-    exit 1
+    fail "This installer currently supports macOS only."
 fi
 
-echo "✓ macOS detected"
+success "macOS detected"
+
+# ============================================================
+# Verify project structure
+# ============================================================
+
+[[ -d "$TAURI_DIR" ]] \
+    || fail "Could not find Alfred directory at: $TAURI_DIR"
+
+[[ -d "$TAURI_SRC" ]] \
+    || fail "Could not find src-tauri at: $TAURI_SRC"
+
+[[ -f "$TAURI_SRC/Cargo.toml" ]] \
+    || fail "Could not find Alfred/src-tauri/Cargo.toml"
+
+[[ -f "$TAURI_SRC/tauri.conf.json" ]] \
+    || fail "Could not find Alfred/src-tauri/tauri.conf.json"
+
+[[ -f "$PROJECT_ROOT/backend.py" ]] \
+    || fail "Could not find backend.py"
+
+[[ -f "$PROJECT_ROOT/backend.spec" ]] \
+    || fail "Could not find backend.spec"
+
+[[ -f "$PROJECT_ROOT/requirements.txt" ]] \
+    || fail "Could not find requirements.txt"
+
+success "Project files found"
 
 # ============================================================
 # Xcode Command Line Tools
@@ -51,21 +99,22 @@ echo "✓ macOS detected"
 
 if ! xcode-select -p >/dev/null 2>&1; then
     echo
-    echo "Xcode Command Line Tools are required."
+    echo "Xcode Command Line Tools are required to compile Alfred."
 
     if ask_yes_no "Install Xcode Command Line Tools now?"; then
         xcode-select --install || true
 
         echo
-        echo "Complete the Apple installation dialog, then run install.sh again."
+        echo "A macOS installation window should have appeared."
+        echo "Finish installing the Command Line Tools and then"
+        echo "run ./install.sh again."
         exit 0
     else
-        echo "Cannot continue without Xcode Command Line Tools."
-        exit 1
+        fail "Xcode Command Line Tools are required."
     fi
 fi
 
-echo "✓ Xcode Command Line Tools found"
+success "Xcode Command Line Tools found"
 
 # ============================================================
 # Homebrew
@@ -73,57 +122,32 @@ echo "✓ Xcode Command Line Tools found"
 
 if ! command_exists brew; then
     echo
-    echo "Homebrew was not found."
+    echo "Homebrew is not installed."
+    echo "Alfred can use Homebrew to install missing dependencies."
 
-    if ask_yes_no "Install Homebrew?"; then
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    if ask_yes_no "Would you like to install Homebrew?"; then
 
-        # Apple Silicon
+        /bin/bash -c \
+        "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+        # Apple Silicon Homebrew
         if [[ -x "/opt/homebrew/bin/brew" ]]; then
             eval "$(/opt/homebrew/bin/brew shellenv)"
         fi
+
+        # Intel Homebrew
+        if [[ -x "/usr/local/bin/brew" ]] && ! command_exists brew; then
+            export PATH="/usr/local/bin:$PATH"
+        fi
+
     else
-        echo "Homebrew is required for automatic dependency installation."
-        exit 1
+        warning "Homebrew installation skipped."
+        echo "Missing dependencies will need to be installed manually."
     fi
 fi
 
-echo "✓ Homebrew found"
-
-# ============================================================
-# Optional Recoll
-# ============================================================
-
-if command_exists recoll; then
-    echo "✓ Recoll found"
-else
-    echo
-    echo "Recoll is not installed."
-
-    if ask_yes_no "Install Recoll now?"; then
-        brew install recoll
-    else
-        echo "Skipping Recoll."
-        echo "Alfred's search functionality may not work until Recoll is installed."
-    fi
-fi
-
-# ============================================================
-# Optional Ollama
-# ============================================================
-
-if command_exists ollama; then
-    echo "✓ Ollama found"
-else
-    echo
-    echo "Ollama is not installed."
-
-    if ask_yes_no "Install Ollama now?"; then
-        brew install --cask ollama
-    else
-        echo "Skipping Ollama."
-        echo "LLM chat will not work until Ollama is installed."
-    fi
+if command_exists brew; then
+    success "Homebrew found"
 fi
 
 # ============================================================
@@ -131,73 +155,221 @@ fi
 # ============================================================
 
 if ! command_exists python3; then
+
     echo
-    echo "Installing Python..."
-    brew install python
+    echo "Python 3 was not found."
+
+    if command_exists brew; then
+        echo "Installing Python..."
+        brew install python
+    else
+        fail "Python 3 is required. Install Python and run this installer again."
+    fi
+
 fi
 
-echo "✓ Python found: $(python3 --version)"
+success "Python: $(python3 --version)"
 
 # ============================================================
-# Node.js
+# Node.js / npm
 # ============================================================
 
 if ! command_exists node || ! command_exists npm; then
+
     echo
-    echo "Installing Node.js..."
-    brew install node
+    echo "Node.js/npm were not found."
+
+    if command_exists brew; then
+        echo "Installing Node.js..."
+        brew install node
+    else
+        fail "Node.js is required. Install Node.js and run this installer again."
+    fi
+
 fi
 
-echo "✓ Node found: $(node --version)"
-echo "✓ npm found: $(npm --version)"
+success "Node: $(node --version)"
+success "npm: $(npm --version)"
 
 # ============================================================
-# Rust
+# Rust / Cargo
 # ============================================================
 
-if ! command_exists cargo || ! command_exists rustc; then
+if ! command_exists rustc || ! command_exists cargo; then
+
     echo
-    echo "Rust is not installed."
+    echo "Rust is required to build the Tauri application."
 
-    if ask_yes_no "Install Rust using rustup?"; then
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    if ask_yes_no "Would you like to install Rust using rustup?"; then
+
+        curl --proto '=https' \
+             --tlsv1.2 \
+             -sSf \
+             https://sh.rustup.rs \
+             | sh -s -- -y
 
         if [[ -f "$HOME/.cargo/env" ]]; then
+            # shellcheck disable=SC1090
             source "$HOME/.cargo/env"
         fi
+
     else
-        echo "Rust is required to build Alfred."
-        exit 1
+        fail "Rust is required to build Alfred."
     fi
 fi
 
-echo "✓ Rust found: $(rustc --version)"
-echo "✓ Cargo found: $(cargo --version)"
+success "Rust: $(rustc --version)"
+success "Cargo: $(cargo --version)"
 
 # ============================================================
-# Verify project files
+# Recoll - optional
 # ============================================================
 
-if [[ ! -d "$TAURI_DIR" ]]; then
-    echo "Error: Alfred directory not found:"
-    echo "$TAURI_DIR"
-    exit 1
+echo
+
+RECOLL_FOUND=false
+
+if command_exists recoll || \
+   command_exists recollindex || \
+   [[ -d "/Applications/Recoll.app" ]]; then
+
+    RECOLL_FOUND=true
+    success "Recoll found"
+
+else
+
+    echo "Recoll was not detected."
+    echo "Recoll provides Alfred's local document search."
+
+    if ask_yes_no "Would you like to install Recoll now?"; then
+
+        if command_exists brew; then
+
+            echo
+            echo "Attempting to install Recoll with Homebrew..."
+
+            if brew install --cask recoll; then
+                RECOLL_FOUND=true
+                success "Recoll installed"
+            else
+                warning "Homebrew could not install Recoll automatically."
+                echo
+                echo "Please install Recoll manually from:"
+                echo "https://www.recoll.org/"
+            fi
+
+        else
+            warning "Homebrew is not available."
+            echo
+            echo "Install Recoll manually from:"
+            echo "https://www.recoll.org/"
+        fi
+
+    else
+        warning "Recoll installation skipped."
+        echo "Document search will not work until Recoll is installed."
+    fi
 fi
 
-if [[ ! -f "$TAURI_SRC/Cargo.toml" ]]; then
-    echo "Error: Cargo.toml not found:"
-    echo "$TAURI_SRC/Cargo.toml"
-    exit 1
+# ============================================================
+# Ollama - optional
+# ============================================================
+
+echo
+
+OLLAMA_FOUND=false
+
+if command_exists ollama || \
+   [[ -d "/Applications/Ollama.app" ]]; then
+
+    OLLAMA_FOUND=true
+    success "Ollama found"
+
+else
+
+    echo "Ollama was not detected."
+    echo "Ollama provides Alfred's local language models."
+
+    if ask_yes_no "Would you like to install Ollama now?"; then
+
+        if command_exists brew; then
+
+            echo
+            echo "Installing Ollama..."
+
+            if brew install --cask ollama; then
+                OLLAMA_FOUND=true
+                success "Ollama installed"
+            else
+                warning "Automatic Ollama installation failed."
+                echo
+                echo "Install Ollama manually from:"
+                echo "https://ollama.com/"
+            fi
+
+        else
+            warning "Homebrew is unavailable."
+            echo
+            echo "Install Ollama manually from:"
+            echo "https://ollama.com/"
+        fi
+
+    else
+        warning "Ollama installation skipped."
+        echo "AI chat will not work until Ollama is installed."
+    fi
 fi
 
-if [[ ! -f "$PROJECT_ROOT/backend.py" ]]; then
-    echo "Error: backend.py not found."
-    exit 1
+# Refresh shell path after optional installations.
+
+hash -r 2>/dev/null || true
+
+if command_exists ollama; then
+    OLLAMA_FOUND=true
 fi
 
-if [[ ! -f "$PROJECT_ROOT/requirements.txt" ]]; then
-    echo "Error: requirements.txt not found."
-    exit 1
+# ============================================================
+# Optional Ollama model
+# ============================================================
+
+if [[ "$OLLAMA_FOUND" == true ]]; then
+
+    echo
+
+    # Launch Ollama.app if available so the local service can start.
+    if [[ -d "/Applications/Ollama.app" ]]; then
+        open -a Ollama >/dev/null 2>&1 || true
+        sleep 2
+    fi
+
+    if command_exists ollama; then
+
+        echo "Installed Ollama models:"
+        echo
+
+        ollama list || true
+
+        echo
+
+        if ask_yes_no \
+            "Would you like to download a starter Ollama model?" \
+            "N"; then
+
+            read -r -p "Model name [llama3.2]: " MODEL_NAME
+            MODEL_NAME="${MODEL_NAME:-llama3.2}"
+
+            echo
+            echo "Downloading Ollama model: $MODEL_NAME"
+            echo "This may take some time depending on model size."
+            echo
+
+            ollama pull "$MODEL_NAME"
+
+            success "Model installed: $MODEL_NAME"
+        fi
+
+    fi
+
 fi
 
 # ============================================================
@@ -205,132 +377,152 @@ fi
 # ============================================================
 
 echo
-echo "Setting up Python environment..."
+echo "------------------------------------------------"
+echo "Setting up Python environment"
+echo "------------------------------------------------"
+echo
+
+cd "$PROJECT_ROOT"
 
 if [[ ! -d "$VENV_DIR" ]]; then
+    echo "Creating virtual environment..."
     python3 -m venv "$VENV_DIR"
 fi
 
+# shellcheck disable=SC1091
 source "$VENV_DIR/bin/activate"
 
+success "Virtual environment active"
+
+echo
+echo "Updating pip..."
+
 python -m pip install --upgrade pip
+
+echo
+echo "Installing Python requirements..."
+
 python -m pip install -r "$PROJECT_ROOT/requirements.txt"
 
+# Ensure PyInstaller exists even if the requirements file changes later.
+
 if ! python -m PyInstaller --version >/dev/null 2>&1; then
+    echo
+    echo "Installing PyInstaller..."
     python -m pip install pyinstaller
 fi
 
-echo "✓ Python environment ready"
+success "Python dependencies installed"
 
 # ============================================================
-# Build backend
+# Build Python backend
 # ============================================================
 
 echo
-echo "Building Python backend..."
+echo "------------------------------------------------"
+echo "Building Alfred backend"
+echo "------------------------------------------------"
+echo
 
 cd "$PROJECT_ROOT"
 
 rm -rf "$PROJECT_ROOT/build"
 rm -rf "$PROJECT_ROOT/dist"
 
-if [[ -f "$PROJECT_ROOT/backend.spec" ]]; then
-    python -m PyInstaller --noconfirm --clean "$PROJECT_ROOT/backend.spec"
-else
-    PYINSTALLER_ARGS=(
-        --noconfirm
-        --clean
-        --onefile
-        --name backend
-    )
-
-    if [[ -d "$PROJECT_ROOT/templates" ]]; then
-        PYINSTALLER_ARGS+=(--add-data "$PROJECT_ROOT/templates:templates")
-    fi
-
-    if [[ -d "$PROJECT_ROOT/static" ]]; then
-        PYINSTALLER_ARGS+=(--add-data "$PROJECT_ROOT/static:static")
-    fi
-
-    if [[ -f "$PROJECT_ROOT/ml_passages.txt" ]]; then
-        PYINSTALLER_ARGS+=(--add-data "$PROJECT_ROOT/ml_passages.txt:.")
-    fi
-
-    PYINSTALLER_ARGS+=("$PROJECT_ROOT/backend.py")
-
-    python -m PyInstaller "${PYINSTALLER_ARGS[@]}"
-fi
+python -m PyInstaller \
+    --clean \
+    --noconfirm \
+    "$PROJECT_ROOT/backend.spec"
 
 BACKEND_BINARY="$PROJECT_ROOT/dist/backend"
 
 if [[ ! -f "$BACKEND_BINARY" ]]; then
-    echo "Error: PyInstaller did not create:"
-    echo "$BACKEND_BINARY"
-    exit 1
+    fail "PyInstaller did not create dist/backend."
 fi
 
-echo "✓ Backend built"
+chmod +x "$BACKEND_BINARY"
+
+success "Python backend built"
 
 # ============================================================
-# Copy backend as Tauri sidecar
+# Determine Rust target
 # ============================================================
 
 TARGET_TRIPLE="$(rustc --print host-tuple)"
 
 echo
-echo "Rust target: $TARGET_TRIPLE"
-
-mkdir -p "$TAURI_SRC/binaries"
-
-TAURI_BACKEND="$TAURI_SRC/binaries/backend-$TARGET_TRIPLE"
-
-cp "$BACKEND_BINARY" "$TAURI_BACKEND"
-chmod +x "$TAURI_BACKEND"
-
-echo "✓ Backend sidecar prepared"
-echo "  $TAURI_BACKEND"
+echo "Detected architecture:"
+echo "$TARGET_TRIPLE"
+echo
 
 # ============================================================
-# Install Node dependencies
+# Prepare Tauri sidecar
+# ============================================================
+
+SIDECAR_DIR="$TAURI_SRC/binaries"
+SIDECAR_PATH="$SIDECAR_DIR/backend-$TARGET_TRIPLE"
+
+mkdir -p "$SIDECAR_DIR"
+
+cp "$BACKEND_BINARY" "$SIDECAR_PATH"
+
+chmod +x "$SIDECAR_PATH"
+
+success "Backend sidecar prepared"
+echo "  $SIDECAR_PATH"
+
+# ============================================================
+# Install JavaScript dependencies
 # ============================================================
 
 echo
-echo "Installing frontend dependencies..."
+echo "------------------------------------------------"
+echo "Installing Tauri / Node dependencies"
+echo "------------------------------------------------"
+echo
 
 cd "$TAURI_DIR"
 
-if [[ -f "package-lock.json" ]]; then
+if [[ -f "$TAURI_DIR/package-lock.json" ]]; then
     npm ci
 else
     npm install
 fi
 
-echo "✓ Frontend dependencies installed"
+success "Node dependencies installed"
 
 # ============================================================
-# Cargo check
+# Verify Rust project
 # ============================================================
 
 echo
-echo "Checking Rust/Tauri configuration..."
+echo "------------------------------------------------"
+echo "Checking Rust/Tauri project"
+echo "------------------------------------------------"
+echo
 
 cd "$TAURI_SRC"
+
 cargo check
 
-echo "✓ Cargo check passed"
+success "Cargo check passed"
 
 # ============================================================
-# Build application
+# Build Tauri app
 # ============================================================
 
 echo
-echo "Building Loki Alfred..."
+echo "------------------------------------------------"
+echo "Building Loki Alfred"
+echo "------------------------------------------------"
+echo
 
 cd "$TAURI_DIR"
+
 npm run tauri build -- --bundles app
 
 # ============================================================
-# Find built app
+# Locate application
 # ============================================================
 
 APP_BUNDLE_DIR="$TAURI_SRC/target/release/bundle/macos"
@@ -338,51 +530,103 @@ APP_BUNDLE_DIR="$TAURI_SRC/target/release/bundle/macos"
 APP_PATH=""
 
 if [[ -d "$APP_BUNDLE_DIR" ]]; then
-    APP_PATH="$(find "$APP_BUNDLE_DIR" -maxdepth 1 -name "*.app" -type d | head -n 1)"
+    APP_PATH="$(
+        find "$APP_BUNDLE_DIR" \
+            -maxdepth 1 \
+            -type d \
+            -name "*.app" \
+            | head -n 1
+    )"
+fi
+
+# ============================================================
+# Installation summary
+# ============================================================
+
+echo
+echo "================================================"
+echo "              Installation Complete"
+echo "================================================"
+echo
+
+success "Python environment configured"
+success "Backend built"
+success "Tauri application built"
+
+if [[ "$RECOLL_FOUND" == true ]]; then
+    success "Recoll detected"
+else
+    warning "Recoll is not currently available"
+fi
+
+if [[ "$OLLAMA_FOUND" == true ]]; then
+    success "Ollama detected"
+else
+    warning "Ollama is not currently available"
 fi
 
 echo
-echo "======================================"
-echo "          Setup Complete"
-echo "======================================"
-echo
 
-if [[ -n "$APP_PATH" ]]; then
-    echo "Alfred was built successfully:"
+if [[ -n "$APP_PATH" && -d "$APP_PATH" ]]; then
+
+    echo "Alfred was built here:"
     echo
-    echo "$APP_PATH"
+    echo "  $APP_PATH"
     echo
 
-    if ask_yes_no "Launch Alfred now?"; then
+    if ask_yes_no "Would you like to launch Alfred now?"; then
         open "$APP_PATH"
     fi
+
 else
-    echo "Build completed, but the .app could not be located automatically."
+
+    warning "The build completed but the .app could not be located automatically."
+
     echo
-    echo "Check:"
-    echo "$TAURI_SRC/target/release/bundle/"
+    echo "Look inside:"
+    echo
+    echo "  $TAURI_SRC/target/release/bundle/"
 fi
 
 # ============================================================
-# Optional Ollama model
+# Recoll reminder
 # ============================================================
 
-if command_exists ollama; then
-    echo
+echo
+echo "------------------------------------------------"
+echo "Before using Alfred"
+echo "------------------------------------------------"
+echo
 
-    if ask_yes_no "Would you like to install a starter Ollama model?" "N"; then
-        read -r -p "Model name [llama3.2]: " MODEL_NAME
-        MODEL_NAME="${MODEL_NAME:-llama3.2}"
-
-        echo "Installing Ollama model: $MODEL_NAME"
-        ollama pull "$MODEL_NAME"
-    fi
+if [[ "$RECOLL_FOUND" == true ]]; then
+    echo "Recoll:"
+    echo "  1. Open Recoll."
+    echo "  2. Select the folders/documents you want indexed."
+    echo "  3. Build or update the Recoll index."
+else
+    echo "Recoll:"
+    echo "  Install Recoll before using Alfred's document search."
 fi
 
 echo
-echo "Important:"
-echo "  • Ollama must be running for AI chat."
-echo "  • At least one Ollama model must be installed."
-echo "  • Recoll must have an index configured for search."
+
+if [[ "$OLLAMA_FOUND" == true ]]; then
+    echo "Ollama:"
+    echo "  Make sure Ollama is running and at least one model"
+    echo "  is installed."
+    echo
+    echo "  View models with:"
+    echo "      ollama list"
+    echo
+    echo "  Download a model with:"
+    echo "      ollama pull llama3.2"
+else
+    echo "Ollama:"
+    echo "  Install Ollama before using Alfred's AI features."
+fi
+
 echo
-echo "Done."
+echo "================================================"
+echo "                  Done!"
+echo "================================================"
+echo
