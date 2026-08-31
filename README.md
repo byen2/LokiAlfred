@@ -43,24 +43,6 @@ All processing happens locally—your documents never leave your computer.
 
 ---
 
-## Prerequisites
-
-Before installing Alfred, install:
-
-- Python 3.12+
-- Rust
-- Node.js
-- Recoll
-- Ollama
-
-Recommended Ollama model:
-
-```
-llama3.2
-```
-
----
-
 ## Installation
 
 Clone the repository:
@@ -73,7 +55,6 @@ cd LokiAlfred
 Run the installer:
 
 ```bash
-chmod +x install.sh
 ./install.sh
 ```
 
@@ -93,19 +74,7 @@ The installer will:
 
 After installation:
 
-Development:
-
-```bash
-cd Alfred
-npm run tauri dev
-```
-
-Production build:
-
-```bash
-cd Alfred
-npm run tauri build
-```
+Double click on the Alfred app to launch. 
 
 The application will automatically launch the bundled backend.
 
