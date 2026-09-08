@@ -174,15 +174,29 @@ CURRENT_SESSION = None
 # =========================
 
 def load_settings():
+    default_settings = {
+        "query": "",
+        "index_dirs": "",
+        "top_docs": "5",
+        "top_passages": "3",
+        "word_radius": "500",
+        "full": False
+    }
 
     if not SETTINGS_FILE.exists():
-        SETTINGS_FILE.write_text("{}")
+        SETTINGS_FILE.write_text(
+            json.dumps(default_settings, indent=2)
+        )
+        return default_settings
 
     try:
-        return json.loads(SETTINGS_FILE.read_text())
-    except:
-        return {}
+        saved_settings = json.loads(SETTINGS_FILE.read_text())
+        
+        #in case additional settings values are added
+        return {**default_settings, **saved_settings}
 
+    except (json.JSONDecodeError, OSError):
+        return default_settings
 
 def save_settings(settings):
     SETTINGS_FILE.write_text(json.dumps(settings, indent=2))
