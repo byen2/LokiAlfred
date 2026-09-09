@@ -5,7 +5,7 @@ a = Analysis(
     ['backend.py'],
     pathex=[],
     binaries=[],
-    datas=[('templates', 'templates'), ('static', 'static'), ('ml_passages.txt', '.'), ('settings.json', '.')],
+    datas=[('templates', 'templates'), ('static', 'static'), ('ml_passages.txt', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

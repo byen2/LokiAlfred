@@ -183,6 +183,8 @@ def load_settings():
         "full": False
     }
 
+    SETTINGS_FILE.parent.mkdir(parents=True, exist_ok=True)
+
     if not SETTINGS_FILE.exists():
         SETTINGS_FILE.write_text(
             json.dumps(default_settings, indent=2)
@@ -191,8 +193,6 @@ def load_settings():
 
     try:
         saved_settings = json.loads(SETTINGS_FILE.read_text())
-        
-        #in case additional settings values are added
         return {**default_settings, **saved_settings}
 
     except (json.JSONDecodeError, OSError):
