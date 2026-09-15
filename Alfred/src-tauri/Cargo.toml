@@ -20,3 +20,6 @@ tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
+# Used to verify that the Python backend is actually
+# returning HTTP 200 before showing the Alfred UI.
+reqwest = { version = "0.12", features = ["blocking"] }

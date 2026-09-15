@@ -5,7 +5,6 @@ use std::{
     sync::Mutex,
     thread,
     time::Duration,
-    net::TcpStream,
 };
 
 use tauri::{
@@ -21,15 +20,39 @@ struct BackendProcess(
     Mutex<Option<tauri_plugin_shell::process::CommandChild>>
 );
 
-fn wait_for_backend() {
-    for _ in 0..100 {
-        if TcpStream::connect("127.0.0.1:8001").is_ok() {
-            return;
+//Adjusted to give pysinstaller time to initialize
+fn wait_for_backend() -> bool {
+    thread::sleep(Duration::from_millis(500));
+
+    for attempt in 1..=60 {
+        println!("Checking backend... attempt {}/60", attempt);
+
+        match reqwest::blocking::get("http://127.0.0.1:8001/") {
+            Ok(response) if response.status().is_success() => {
+                println!("Backend is ready.");
+                return true;
+            }
+
+            Ok(response) => {
+                eprintln!(
+                    "Backend responded with HTTP {}. Retrying...",
+                    response.status()
+                );
+            }
+
+            Err(error) => {
+                eprintln!(
+                    "Backend not ready yet: {}",
+                    error
+                );
+            }
         }
-        thread::sleep(Duration::from_millis(100));
+
+        thread::sleep(Duration::from_millis(500));
     }
 
-    eprintln!("Backend did not start within timeout.");
+    eprintln!("Backend failed to become ready after 30 seconds.");
+    false
 }
 
 fn main() {
@@ -89,13 +112,20 @@ fn main() {
             // -------------------------
             // WAIT + NAVIGATE
             // -------------------------
-            wait_for_backend();
-
-            let window = app.get_webview_window("main").unwrap();
-
-            let _ = window.eval(
-                "window.location.replace('http://127.0.0.1:8001');"
-            );
+            if wait_for_backend() {
+                println!("Backend confirmed healthy. Loading Alfred.");
+            
+                let window = app.get_webview_window("main").unwrap();
+            
+                let _ = window.eval(
+                    "window.location.replace('http://127.0.0.1:8001');"
+                );
+            
+                let _ = window.show();
+                let _ = window.set_focus();
+            } else {
+                eprintln!("Alfred backend failed to start.");
+            }
 
             Ok(())
         })
