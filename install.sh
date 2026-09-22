@@ -426,6 +426,23 @@ echo
 
 cd "$PROJECT_ROOT"
 
+# Verify SSL works in the Python environment before freezing it.
+echo "Checking Python SSL environment..."
+
+if ! python -c 'import ssl; print("Python OpenSSL:", ssl.OPENSSL_VERSION)'; then
+    fail "Python's SSL module is not working. Cannot build the backend."
+fi
+
+# PyInstaller applications must not inherit unrelated library search
+# paths from software such as MySQL, database clients, or SDKs.
+#
+# Save the user's environment so it can be restored after PyInstaller.
+OLD_DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH-}"
+OLD_DYLD_FALLBACK_LIBRARY_PATH="${DYLD_FALLBACK_LIBRARY_PATH-}"
+
+unset DYLD_LIBRARY_PATH
+unset DYLD_FALLBACK_LIBRARY_PATH
+
 rm -rf "$PROJECT_ROOT/build"
 rm -rf "$PROJECT_ROOT/dist"
 
@@ -433,6 +450,19 @@ python -m PyInstaller \
     --clean \
     --noconfirm \
     "$PROJECT_ROOT/backend.spec"
+
+# Restore the original environment.
+if [[ -n "$OLD_DYLD_LIBRARY_PATH" ]]; then
+    export DYLD_LIBRARY_PATH="$OLD_DYLD_LIBRARY_PATH"
+else
+    unset DYLD_LIBRARY_PATH
+fi
+
+if [[ -n "$OLD_DYLD_FALLBACK_LIBRARY_PATH" ]]; then
+    export DYLD_FALLBACK_LIBRARY_PATH="$OLD_DYLD_FALLBACK_LIBRARY_PATH"
+else
+    unset DYLD_FALLBACK_LIBRARY_PATH
+fi
 
 BACKEND_BINARY="$PROJECT_ROOT/dist/backend"
 
@@ -443,6 +473,56 @@ fi
 chmod +x "$BACKEND_BINARY"
 
 success "Python backend built"
+
+# ============================================================
+# Smoke-test frozen backend
+# ============================================================
+
+echo
+echo "Testing frozen backend..."
+
+BACKEND_LOG="$PROJECT_ROOT/build/backend-smoke-test.log"
+
+rm -f "$BACKEND_LOG"
+
+"$BACKEND_BINARY" >"$BACKEND_LOG" 2>&1 &
+BACKEND_TEST_PID=$!
+
+BACKEND_OK=false
+
+for _ in {1..20}; do
+    # If the process has already crashed, stop waiting.
+    if ! kill -0 "$BACKEND_TEST_PID" 2>/dev/null; then
+        break
+    fi
+
+    if curl -fsS "http://127.0.0.1:8001/" >/dev/null 2>&1; then
+        BACKEND_OK=true
+        break
+    fi
+
+    sleep 0.5
+done
+
+# Stop the test backend if it is still running.
+if kill -0 "$BACKEND_TEST_PID" 2>/dev/null; then
+    kill "$BACKEND_TEST_PID" 2>/dev/null || true
+    wait "$BACKEND_TEST_PID" 2>/dev/null || true
+fi
+
+if [[ "$BACKEND_OK" != true ]]; then
+    echo
+    echo "Frozen backend failed its startup test."
+    echo
+    echo "Backend output:"
+    echo "------------------------------------------------"
+    cat "$BACKEND_LOG" || true
+    echo "------------------------------------------------"
+    echo
+    fail "The Python backend was built, but it could not start correctly."
+fi
+
+success "Frozen backend startup test passed"
 
 # ============================================================
 # Determine Rust target
