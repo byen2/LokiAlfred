@@ -3,162 +3,218 @@
 {% block content %}
 
 <style>
+    html,
+    body {
+        margin: 0;
+        background: #0b1220;
+    }
 
-html, body {
-    margin: 0;
-    height: 100%;
-    background: #0b1220;
-}
+    .settings-page {
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+        background: #0b1220;
+    }
 
-.settings-page {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
+    .page-header {
+        padding: 20px;
+        border-bottom: 1px solid #1e293b;
+        background: #0f172a;
 
-/* Header */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+    }
 
-.page-header {
-    padding: 20px;
-    border-bottom: 1px solid #1e293b;
-    background: #0f172a;
+    .page-header h1 {
+        margin: 0;
+        font-size: 26px;
+        color: #e2e8f0;
+    }
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-}
+    .subtitle {
+        text-align: center;
+        color: #94a3b8;
+        margin-top: 6px;
+        margin-bottom: 20px;
+    }
 
-.page-header h1 {
-    margin: 0;
-    font-size: 26px;
-    color: #e2e8f0;
-}
+    .settings-wrapper {
+        display: flex;
+        justify-content: center;
+        padding: 10px 20px 30px 20px;
+        box-sizing: border-box;
+    }
 
-.subtitle {
-    text-align: center;
-    color: #94a3b8;
-    margin-top: 6px;
-    margin-bottom: 20px;
-}
+    .settings-form {
+        width: 100%;
+        max-width: 650px;
+        box-sizing: border-box;
 
-/* Layout */
+        background: #0f172a;
+        border: 1px solid #1e293b;
+        border-radius: 14px;
 
-.settings-wrapper {
-    display: flex;
-    justify-content: center;
-    padding: 10px 20px 30px 20px;
-}
+        padding: 28px;
 
-/* Card */
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
 
-.settings-form {
-    width: 100%;
-    max-width: 650px;
+    .settings-form label {
+        color: #cbd5e1;
+        font-size: 14px;
+    }
 
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    border-radius: 14px;
+    .settings-form input {
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #1e293b;
+        background: #020617;
+        color: white;
+        box-sizing: border-box;
+    }
 
-    padding: 28px;
+    .primary-btn {
+        margin-top: 12px;
+        padding: 14px;
+        background: #2563eb;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+    }
 
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
+    .primary-btn:hover {
+        background: #1d4ed8;
+    }
 
-.settings-form label {
-    color: #cbd5e1;
-    font-size: 14px;
-}
-
-.settings-form input {
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #1e293b;
-    background: #020617;
-    color: white;
-}
-
-.primary-btn {
-    margin-top: 12px;
-    padding: 14px;
-    background: #2563eb;
-    border: none;
-    border-radius: 10px;
-    color: white;
-    cursor: pointer;
-}
-
-.primary-btn:hover {
-    background: #1d4ed8;
-}
-
-.settings-msg {
-    text-align: center;
-    margin-top: 10px;
-}
-
+    .settings-msg {
+        text-align: center;
+        margin-top: 10px;
+    }
 </style>
 
 <div class="settings-page">
+    <div class="page-header">
+        <span style="font-size: 24px;">⚙️</span>
+        <h1>Recoll Settings</h1>
+    </div>
 
-<div class="page-header">
-<span style="font-size:24px">⚙️</span>
-<h1>Recoll Settings</h1>
+    <div class="subtitle">
+        🧠 Configure your search & indexing parameters
+    </div>
+
+    <div class="settings-wrapper">
+        <form id="settings-form" class="settings-form">
+            <label>🔎 Search Query</label>
+            <input
+                type="text"
+                id="query"
+                value="{{ (settings or {}).get('query','') }}"
+                required
+            >
+
+            <label>📁 Index Directories</label>
+            <input
+                type="text"
+                id="index_dir"
+                value="{{ (settings or {}).get('index_dirs','') }}"
+            >
+
+            <label>📄 Top Documents</label>
+            <input
+                type="number"
+                id="top_docs"
+                value="{{ (settings or {}).get('top_docs',5) }}"
+            >
+
+            <label>🧠 Top Passages</label>
+            <input
+                type="number"
+                id="top_passages"
+                value="{{ (settings or {}).get('top_passages',3) }}"
+            >
+
+            <label>📏 Word Radius</label>
+            <input
+                type="number"
+                id="word_radius"
+                value="{{ (settings or {}).get('word_radius',500) }}"
+            >
+
+            <label>
+                <input
+                    type="checkbox"
+                    id="full"
+                    {% if (settings or {}).get('full') %}checked{% endif %}
+                >
+                🔄 Force Full Reindex
+            </label>
+
+            <button type="submit" class="primary-btn">
+                🚀 Run Search
+            </button>
+
+            <div id="settings-msg" class="settings-msg"></div>
+        </form>
+    </div>
 </div>
 
-<div class="subtitle">
-🧠 Configure your search & indexing parameters
-</div>
+<script>
+    const settingsForm = document.getElementById("settings-form");
+    const settingsMsg = document.getElementById("settings-msg");
 
-<div class="settings-wrapper">
+    settingsForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-<form id="settings-form" class="settings-form">
+        settingsMsg.textContent = "⏳ Running Recoll indexing...";
+        settingsMsg.style.color = "#94a3b8";
 
-<label>🔎 Search Query</label>
-<input type="text"
-id="query"
-value="{{ (prev_settings or {}).get('query','') }}"
-required>
+        const payload = {
+            query: document.getElementById("query").value,
+            index_dirs: document.getElementById("index_dir").value,
+            top_docs: document.getElementById("top_docs").value,
+            top_passages: document.getElementById("top_passages").value,
+            word_radius: document.getElementById("word_radius").value,
+            full: document.getElementById("full").checked
+        };
 
-<label>📁 Index Directories</label>
-<input type="text"
-id="index_dir"
-value="{{ (prev_settings or {}).get('index_dirs','') }}">
+        try {
+            const response = await fetch("/run_search", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
 
-<label>📄 Top Documents</label>
-<input type="number"
-id="top_docs"
-value="{{ (prev_settings or {}).get('top_docs',5) }}">
+            const data = await response.json();
 
-<label>🧠 Top Passages</label>
-<input type="number"
-id="top_passages"
-value="{{ (prev_settings or {}).get('top_passages',3) }}">
+            if (!response.ok || data.status === "error") {
+                settingsMsg.textContent =
+                    "❌ " + (data.error || "Indexing failed.");
 
-<label>📏 Word Radius</label>
-<input type="number"
-id="word_radius"
-value="{{ (prev_settings or {}).get('word_radius',500) }}">
+                settingsMsg.style.color = "#f87171";
+                return;
+            }
 
-<label>
-<input type="checkbox"
-id="full"
-{% if (prev_settings or {}).get('full') %}checked{% endif %}>
-🔄 Force Full Reindex
-</label>
+            settingsMsg.textContent =
+                "✅ " + (data.message || "Indexing completed.");
 
-<button class="primary-btn">
-🚀 Run Search
-</button>
+            settingsMsg.style.color = "#4ade80";
 
-<div id="settings-msg" class="settings-msg"></div>
+        } catch (error) {
+            console.error(error);
 
-</form>
+            settingsMsg.textContent =
+                "❌ Could not connect to the backend.";
 
-</div>
-
-</div>
+            settingsMsg.style.color = "#f87171";
+        }
+    });
+</script>
 
 {% endblock %}

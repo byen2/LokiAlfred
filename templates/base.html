@@ -1,80 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Recoll QA</title>
-<link rel="stylesheet" href="/static/styles.css">
-<style>
-/* ---------------- POLISHED NAVBAR ---------------- */
-.navbar {
-    background-color: #1e272e;
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    padding: 12px 0;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
+    <meta charset="UTF-8">
+    <title>Recoll QA</title>
+    <link rel="stylesheet" href="/static/styles.css">
 
-.navbar a {
-    color: white;
-    text-decoration: none;
-    font-weight: 600;
-    padding: 8px 12px;
-    border-radius: 6px;
-    transition: all 0.2s ease-in-out;
-    font-size: 16px;
-}
+    <style>
 
-.navbar a:hover {
-    background-color: #0984e3;
-    color: white;
-}
+        .navbar {
+            background-color: #1e272e;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 12px 0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-.navbar a.active {
-    background-color: #74b9ff;
-    color: #1e272e;
-}
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease-in-out;
+            font-size: 16px;
+        }
 
-html, body {
-    margin: 0;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-}
+        .navbar a:hover {
+            background-color: #0984e3;
+            color: white;
+        }
 
-body {
-    display: flex;
-    flex-direction: column;
-}
+        .navbar a.active {
+            background-color: #74b9ff;
+            color: #1e272e;
+        }
 
-.page {
-    flex: 1;
-    width: 100%;
-    max-width: none;
-    min-width: 0;
-    min-height: 0;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-}
-</style>
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
 
+        body {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .page {
+            flex: 1;
+            width: 100%;
+            max-width: none;
+            min-width: 0;
+            min-height: 0;
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .page:has(.chat-layout) {
+            overflow: hidden;
+        }
+
+    </style>
 </head>
-    <body>
 
+<body>
     <div class="navbar">
-        <a href="/" class="{% if request.url.path == '/' %}active{% endif %}">Ask Alfred</a>
-        <a href="/preview" class="{% if request.url.path == '/preview' %}active{% endif %}">Preview</a>
-        <a href="/settings" class="{% if request.url.path == '/settings' %}active{% endif %}">Settings</a>
-        <a href="/about" class="{% if request.url.path == '/about' %}active{% endif %}">About</a>
+        <a
+            href="/"
+            class="{% if request.url.path == '/' %}active{% endif %}"
+        >
+            Ask Alfred
+        </a>
+
+        <a
+            href="/preview"
+            class="{% if request.url.path == '/preview' %}active{% endif %}"
+        >
+            Preview
+        </a>
+
+        <a
+            href="/settings"
+            class="{% if request.url.path == '/settings' %}active{% endif %}"
+        >
+            Settings
+        </a>
+
+        <a
+            href="/about"
+            class="{% if request.url.path == '/about' %}active{% endif %}"
+        >
+            About
+        </a>
     </div>
 
     <div class="page">
-    {% block content %}{% endblock %}
+        {% block content %}
+        {% endblock %}
     </div>
-
-    </body>
+</body>
 </html>
