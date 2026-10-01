@@ -16,13 +16,36 @@ import re
 from pathlib import Path
 from urllib.parse import urlparse, unquote
 import fitz  # PyMuPDF
+import shutil
 
 
 # =======================
 # CONFIG
 # =======================
-RECOLLQ = "/Applications/Recoll.app/Contents/MacOS/recollq"
-RECOLLINDEX = "/Applications/Recoll.app/Contents/MacOS/recollindex"
+def find_recoll_binary(name):
+    path = shutil.which(name)
+
+    if path:
+        return path
+
+    candidates = [
+        f"/Applications/Recoll.app/Contents/MacOS/{name}",
+        f"/Applications/recoll.app/Contents/MacOS/{name}",
+        f"/opt/homebrew/bin/{name}",
+        f"/usr/local/bin/{name}",
+    ]
+
+    for candidate in candidates:
+        p = Path(candidate)
+
+        if p.exists() and p.is_file():
+            return str(p)
+
+    return None
+
+
+RECOLLQ = find_recoll_binary("recollq")
+RECOLLINDEX = find_recoll_binary("recollindex")
 
 BASE_DIR = Path.home() / ".my_recoll_tool"
 CONF_DIR = BASE_DIR / "recoll"
@@ -274,6 +297,15 @@ def write_output(results, out_path):
 # CLI
 # =======================
 def main():
+
+    if RECOLLQ is None:
+        print("[ERROR] recollq could not be found.", file=sys.stderr)
+        sys.exit(1)
+
+    if RECOLLINDEX is None:
+        print("[ERROR] recollindex could not be found.", file=sys.stderr)
+        sys.exit(1)
+        
     parser = argparse.ArgumentParser(description="Recoll + PyMuPDF Ranked Passage Retrieval with Indexing")
 
     parser.add_argument("--index", nargs="+", help="Directories to index before searching")
