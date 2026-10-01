@@ -17,6 +17,13 @@ from starlette.requests import Request
 from starlette.templating import Jinja2Templates
 from starlette.staticfiles import StaticFiles
 
+from recoll_ranked import (
+    write_recoll_conf,
+    run_indexer,
+    retrieve_ranked_passages,
+    write_output,
+)
+
 
 # =========================
 # PATHS
@@ -47,9 +54,6 @@ if getattr(sys, 'frozen', False):
 else:
     BASE_DIR = Path(__file__).parent
 
-PASSAGES_FILE = BASE_DIR / "ml_passages.txt"
-
-
 ANSI_RE = re.compile(r"\x1B\[[0-9;]*[A-Za-z]")
 
 THINKING_RE = re.compile(
@@ -60,6 +64,28 @@ THINKING_RE = re.compile(
 )
 
 DUPLICATE_JOINED_RE = re.compile(r"\b([A-Za-z]{3,})\1\b")
+
+def find_recollindex():
+    path = shutil.which("recollindex")
+    if path:
+        return path
+
+    candidates = [
+        "/Applications/Recoll.app/Contents/MacOS/recollindex",
+        "/Applications/recoll.app/Contents/MacOS/recollindex",
+        "/opt/homebrew/bin/recollindex",
+        "/usr/local/bin/recollindex",
+    ]
+
+    for candidate in candidates:
+        p = Path(candidate)
+        if p.exists() and p.is_file():
+            return str(p)
+
+    return None
+
+
+RECOLLINDEX_PATH = find_recollindex()
 
 def clean_ollama(text: str) -> str:
     if not text:
@@ -128,10 +154,14 @@ DATA_DIR = Path.home() / "Library/Application Support/loki-alfred"
 HISTORY_DIR = DATA_DIR / "history"
 ARCHIVE_DIR = DATA_DIR / "archive"
 SETTINGS_FILE = DATA_DIR / "settings.json"
+PASSAGES_FILE = DATA_DIR / "ml_passages.txt"
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 HISTORY_DIR.mkdir(parents=True, exist_ok=True)
 ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+
+if not PASSAGES_FILE.exists():
+    PASSAGES_FILE.write_text("", encoding="utf-8")
 
 # =========================
 # AUTOMATIC MIGRATION
@@ -306,6 +336,123 @@ async def settings(request):
         {"request": request, "settings": get_safe_settings()}
     )
 
+@app.route("/run_search", methods=["POST"])
+async def run_search(request):
+    try:
+        data = await request.json()
+
+        settings = {
+            "query": str(data.get("query", "")).strip(),
+            "index_dirs": str(data.get("index_dirs", "")).strip(),
+            "top_docs": str(data.get("top_docs", "5")),
+            "top_passages": str(data.get("top_passages", "3")),
+            "word_radius": str(data.get("word_radius", "500")),
+            "full": bool(data.get("full", False)),
+        }
+
+        save_settings(settings)
+
+        query = settings["query"]
+
+        # Allow multiple directories separated by newlines.
+        directories = [
+            line.strip()
+            for line in settings["index_dirs"].splitlines()
+            if line.strip()
+        ]
+
+        if not query:
+            return JSONResponse(
+                {"status": "error", "error": "No search query was provided."},
+                status_code=400
+            )
+
+        if not directories:
+            return JSONResponse(
+                {"status": "error", "error": "No index directory was provided."},
+                status_code=400
+            )
+
+        top_docs = int(settings["top_docs"])
+        top_passages = int(settings["top_passages"])
+        word_radius = int(settings["word_radius"])
+
+        print("========== RECOLL PIPELINE ==========")
+        print("Query:", query)
+        print("Directories:", directories)
+        print("Top docs:", top_docs)
+        print("Top passages:", top_passages)
+        print("Word radius:", word_radius)
+        print("Full:", settings["full"])
+        print("Output:", PASSAGES_FILE)
+
+        # Configure Recoll for the selected directories.
+        await asyncio.to_thread(
+            write_recoll_conf,
+            directories
+        )
+
+        # Build/update the Recoll index.
+        await asyncio.to_thread(
+            run_indexer,
+            settings["full"]
+        )
+
+        # Search Recoll and extract/rank PDF passages.
+        results = await asyncio.to_thread(
+            retrieve_ranked_passages,
+            query,
+            top_docs,
+            top_passages,
+            word_radius
+        )
+
+        print("Ranked passages found:", len(results))
+
+        for result in results:
+            print(
+                "FOUND:",
+                result["pdf"],
+                "page",
+                result["page"],
+                "score",
+                result["page_score"]
+            )
+
+        # Write exactly where Preview reads from.
+        write_output(results, PASSAGES_FILE)
+
+        print("Output file:", PASSAGES_FILE)
+        print("Output exists:", PASSAGES_FILE.exists())
+        print(
+            "Output size:",
+            PASSAGES_FILE.stat().st_size
+            if PASSAGES_FILE.exists()
+            else 0
+        )
+        print("=====================================")
+
+        if not results:
+            return JSONResponse({
+                "status": "error",
+                "error": (
+                    "Recoll indexing completed, but no matching PDF "
+                    "passages were found for this query."
+                )
+            }, status_code=404)
+
+        return JSONResponse({
+            "status": "ok",
+            "message": f"Found {len(results)} ranked passages."
+        })
+
+    except Exception as e:
+        print("RUN SEARCH ERROR:", repr(e))
+
+        return JSONResponse(
+            {"status": "error", "error": str(e)},
+            status_code=500
+        )
 
 @app.route("/preview")
 async def preview(request):
