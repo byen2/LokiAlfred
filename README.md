@@ -144,6 +144,50 @@ npm run tauri build
 
 ---
 
+## Usage Guide
+
+---
+
+### Running Index in Settings
+
+<img width="2168" height="1690" alt="recoll settings" src="https://github.com/user-attachments/assets/e1be2427-3723-45e7-8a96-2f61a6ad75ae" />
+
+Search Query: Single Keyword most relevant to desired subject
+
+Index Directories: Insert path(s) to directory into this field to instruct Alfred to search through
+
+Top Documents: Top X most relevant files inside directories, based on ranking score. 
+
+Top Passages: Top X most relevant passages in Top Documents, based on ranking score. 
+
+Word Radius: X number of words found before and after the Keyword
+
+Force Full Reindex: Force recoll to fully reindex based on your desired parameters
+
+---
+
+### Preview Tab
+
+---
+
+<img width="2156" height="1682" alt="preview tab" src="https://github.com/user-attachments/assets/289f4e39-462f-4279-b4d1-7a1bae7f09e0" />
+
+Preview tab shows results of Alfred indexing for review and fact checking
+
+---
+
+### Ask Alfred
+
+---
+
+<img width="2166" height="1696" alt="ask alfred" src="https://github.com/user-attachments/assets/8412f54d-fac9-45ab-a425-1e50ec4fefa7" />
+
+Changing Models: Select the Dropdown menu directly to the right of Ask Alfred. It will include all downloaded models in Ollama.
+
+Creating/Deleting Chats: Select "New Chat". To delete, click the check box next to each chat and select "Delete"
+
+---
+
 ## Troubleshooting
 
 ### Backend won't start
