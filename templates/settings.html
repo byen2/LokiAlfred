@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% block content %}
@@ -42,12 +43,15 @@
 
     .settings-wrapper {
         display: flex;
-        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        gap: 22px;
         padding: 10px 20px 30px 20px;
         box-sizing: border-box;
     }
 
-    .settings-form {
+    .settings-form,
+    .zotero-panel {
         width: 100%;
         max-width: 650px;
         box-sizing: border-box;
@@ -63,18 +67,25 @@
         gap: 14px;
     }
 
-    .settings-form label {
+    .settings-form label,
+    .zotero-panel label {
         color: #cbd5e1;
         font-size: 14px;
     }
 
-    .settings-form input {
+    .settings-form input:not([type="checkbox"]),
+    .zotero-panel select {
+        width: 100%;
         padding: 12px;
         border-radius: 8px;
         border: 1px solid #1e293b;
         background: #020617;
         color: white;
         box-sizing: border-box;
+    }
+
+    .settings-form input[type="checkbox"] {
+        accent-color: #2563eb;
     }
 
     .primary-btn {
@@ -91,9 +102,78 @@
         background: #1d4ed8;
     }
 
+    .primary-btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+    .secondary-btn {
+        padding: 11px 14px;
+        background: #1e293b;
+        color: #e2e8f0;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .secondary-btn:hover {
+        background: #334155;
+    }
+
+    .secondary-btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
     .settings-msg {
         text-align: center;
         margin-top: 10px;
+    }
+
+    .zotero-panel h2 {
+        color: #e2e8f0;
+        font-size: 20px;
+        margin: 0;
+    }
+
+    .muted {
+        color: #94a3b8;
+        font-size: 13px;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .status-line {
+        color: #94a3b8;
+        font-size: 14px;
+        min-height: 20px;
+    }
+
+    .reference-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        max-height: 310px;
+        overflow-y: auto;
+        border: 1px solid #1e293b;
+        border-radius: 8px;
+    }
+
+    .reference-list li {
+        padding: 12px;
+        color: #e2e8f0;
+        border-bottom: 1px solid #1e293b;
+        overflow-wrap: anywhere;
+    }
+
+    .reference-list li:last-child {
+        border-bottom: none;
+    }
+
+    .reference-meta {
+        color: #94a3b8;
+        font-size: 12px;
+        margin-top: 4px;
     }
 </style>
 
@@ -104,12 +184,12 @@
     </div>
 
     <div class="subtitle">
-        🧠 Configure your search & indexing parameters
+        🧠 Configure your search &amp; indexing parameters
     </div>
 
     <div class="settings-wrapper">
         <form id="settings-form" class="settings-form">
-            <label>🔎 Search Query</label>
+            <label for="query">🔎 Search Query</label>
             <input
                 type="text"
                 id="query"
@@ -117,31 +197,34 @@
                 required
             >
 
-            <label>📁 Index Directories</label>
+            <label for="index_dir">📁 Index Directories</label>
             <input
                 type="text"
                 id="index_dir"
                 value="{{ (settings or {}).get('index_dirs','') }}"
             >
 
-            <label>📄 Top Documents</label>
+            <label for="top_docs">📄 Top Documents</label>
             <input
                 type="number"
                 id="top_docs"
+                min="1"
                 value="{{ (settings or {}).get('top_docs',5) }}"
             >
 
-            <label>🧠 Top Passages</label>
+            <label for="top_passages">🧠 Top Passages</label>
             <input
                 type="number"
                 id="top_passages"
+                min="1"
                 value="{{ (settings or {}).get('top_passages',3) }}"
             >
 
-            <label>📏 Word Radius</label>
+            <label for="word_radius">📏 Word Radius</label>
             <input
                 type="number"
                 id="word_radius"
+                min="1"
                 value="{{ (settings or {}).get('word_radius',500) }}"
             >
 
@@ -154,67 +237,365 @@
                 🔄 Force Full Reindex
             </label>
 
-            <button type="submit" class="primary-btn">
+            <button
+                type="submit"
+                class="primary-btn"
+                id="run-search-btn"
+            >
                 🚀 Run Search
             </button>
 
-            <div id="settings-msg" class="settings-msg"></div>
+            <div
+                id="settings-msg"
+                class="settings-msg"
+                role="status"
+                aria-live="polite"
+            ></div>
         </form>
+
+        <section
+            class="zotero-panel"
+            aria-labelledby="zotero-heading"
+        >
+            <h2 id="zotero-heading">
+                📚 Zotero Integration
+            </h2>
+
+            <p class="muted">
+                Connect to Zotero Desktop on this Mac.
+                Alfred only reads collection and reference information;
+                it does not change your Zotero library.
+            </p>
+
+            <button
+                type="button"
+                class="secondary-btn"
+                id="zotero-connect"
+            >
+                Check Zotero Connection
+            </button>
+
+            <div
+                class="status-line"
+                id="zotero-status"
+                role="status"
+                aria-live="polite"
+            >
+                Checking Zotero...
+            </div>
+
+            <label for="zotero-collection">
+                Zotero Collection
+            </label>
+
+            <select
+                id="zotero-collection"
+                disabled
+            >
+                <option value="">
+                    Connect to Zotero first
+                </option>
+            </select>
+
+            <button
+                type="button"
+                class="secondary-btn"
+                id="zotero-load"
+                disabled
+            >
+                Show References
+            </button>
+
+            <p
+                class="muted"
+                id="zotero-count"
+            >
+                Select a collection to see its references.
+            </p>
+
+            <ul
+                id="zotero-references"
+                class="reference-list"
+                aria-label="Zotero references"
+                hidden
+            ></ul>
+
+            <p class="muted">
+                PDF attachment indexing is not enabled yet.
+                This section currently displays reference metadata only.
+            </p>
+        </section>
     </div>
 </div>
 
 <script>
-    const settingsForm = document.getElementById("settings-form");
-    const settingsMsg = document.getElementById("settings-msg");
+    (() => {
+        const settingsForm = document.getElementById("settings-form");
+        const settingsMsg = document.getElementById("settings-msg");
+        const searchButton = document.getElementById("run-search-btn");
 
-    settingsForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
+        settingsForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
 
-        settingsMsg.textContent = "⏳ Running Recoll indexing...";
-        settingsMsg.style.color = "#94a3b8";
+            searchButton.disabled = true;
+            settingsMsg.textContent = "⏳ Running Recoll indexing...";
+            settingsMsg.style.color = "#94a3b8";
 
-        const payload = {
-            query: document.getElementById("query").value,
-            index_dirs: document.getElementById("index_dir").value,
-            top_docs: document.getElementById("top_docs").value,
-            top_passages: document.getElementById("top_passages").value,
-            word_radius: document.getElementById("word_radius").value,
-            full: document.getElementById("full").checked
-        };
+            const payload = {
+                query: document.getElementById("query").value,
+                index_dirs: document.getElementById("index_dir").value,
+                top_docs: document.getElementById("top_docs").value,
+                top_passages: document.getElementById("top_passages").value,
+                word_radius: document.getElementById("word_radius").value,
+                full: document.getElementById("full").checked
+            };
 
-        try {
-            const response = await fetch("/run_search", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-            });
+            try {
+                const response = await fetch("/run_search", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            if (!response.ok || data.status === "error") {
+                if (!response.ok || data.status === "error") {
+                    settingsMsg.textContent =
+                        "❌ " + (data.error || "Indexing failed.");
+
+                    settingsMsg.style.color = "#f87171";
+                    return;
+                }
+
                 settingsMsg.textContent =
-                    "❌ " + (data.error || "Indexing failed.");
+                    "✅ " + (data.message || "Indexing completed.");
+
+                settingsMsg.style.color = "#4ade80";
+
+            } catch (error) {
+                console.error(error);
+
+                settingsMsg.textContent =
+                    "❌ Could not connect to the backend.";
 
                 settingsMsg.style.color = "#f87171";
+
+            } finally {
+                searchButton.disabled = false;
+            }
+        });
+
+        const connectButton = document.getElementById("zotero-connect");
+        const status = document.getElementById("zotero-status");
+        const collectionSelect = document.getElementById("zotero-collection");
+        const loadButton = document.getElementById("zotero-load");
+        const count = document.getElementById("zotero-count");
+        const references = document.getElementById("zotero-references");
+
+        async function readJSON(url) {
+            const response = await fetch(url, {
+                cache: "no-store"
+            });
+
+            let data;
+
+            try {
+                data = await response.json();
+            } catch {
+                throw new Error(
+                    "Invalid response from Alfred backend."
+                );
+            }
+
+            if (
+                !response.ok ||
+                data.status === "error" ||
+                data.connected === false
+            ) {
+                throw new Error(
+                    data.error || "Request failed."
+                );
+            }
+
+            return data;
+        }
+
+        function resetReferences(message) {
+            references.replaceChildren();
+            references.hidden = true;
+            count.textContent = message;
+        }
+
+        async function connectZotero() {
+            connectButton.disabled = true;
+            collectionSelect.disabled = true;
+            loadButton.disabled = true;
+
+            collectionSelect.replaceChildren(
+                new Option("Checking Zotero...", "")
+            );
+
+            resetReferences(
+                "Select a collection to see its references."
+            );
+
+            status.textContent =
+                "⏳ Connecting to Zotero Desktop...";
+
+            status.style.color = "#94a3b8";
+
+            try {
+                await readJSON("/zotero/status");
+
+                const data = await readJSON("/zotero/collections");
+
+                const collections = Array.isArray(data.collections)
+                    ? data.collections
+                    : [];
+
+                status.textContent =
+                    "✅ Connected to Zotero Desktop";
+
+                status.style.color = "#4ade80";
+
+                collectionSelect.replaceChildren(
+                    new Option("Select a collection", "")
+                );
+
+                for (const collection of collections) {
+                    collectionSelect.add(
+                        new Option(
+                            collection.name || "Untitled Collection",
+                            collection.key
+                        )
+                    );
+                }
+
+                if (collections.length > 0) {
+                    collectionSelect.disabled = false;
+
+                    count.textContent =
+                        `${collections.length} collection(s) available.`;
+
+                } else {
+                    collectionSelect.replaceChildren(
+                        new Option("No collections found", "")
+                    );
+
+                    count.textContent =
+                        "Zotero is connected, but no collections exist yet. " +
+                        "Create one in Zotero and check again.";
+                }
+
+            } catch (error) {
+                status.textContent =
+                    "❌ " + error.message;
+
+                status.style.color = "#f87171";
+
+                collectionSelect.replaceChildren(
+                    new Option("Connect to Zotero first", "")
+                );
+
+                resetReferences(
+                    "Open Zotero Desktop and enable its local API, " +
+                    "then try again."
+                );
+
+            } finally {
+                connectButton.disabled = false;
+            }
+        }
+
+        collectionSelect.addEventListener("change", () => {
+            loadButton.disabled = !collectionSelect.value;
+
+            resetReferences(
+                "Click Show References to load this collection."
+            );
+        });
+
+        loadButton.addEventListener("click", async () => {
+            const key = collectionSelect.value;
+
+            if (!key) {
                 return;
             }
 
-            settingsMsg.textContent =
-                "✅ " + (data.message || "Indexing completed.");
+            loadButton.disabled = true;
 
-            settingsMsg.style.color = "#4ade80";
+            resetReferences("⏳ Loading references...");
 
-        } catch (error) {
-            console.error(error);
+            try {
+                const data = await readJSON(
+                    `/zotero/collection-items?key=${encodeURIComponent(key)}`
+                );
 
-            settingsMsg.textContent =
-                "❌ Could not connect to the backend.";
+                if (collectionSelect.value !== key) {
+                    return;
+                }
 
-            settingsMsg.style.color = "#f87171";
-        }
-    });
+                const items = Array.isArray(data.items)
+                    ? data.items
+                    : [];
+
+                count.textContent =
+                    `${items.length} reference(s) loaded.`;
+
+                if (items.length === 0) {
+                    count.textContent =
+                        "This collection contains no references yet.";
+
+                    return;
+                }
+
+                for (const item of items) {
+                    const li = document.createElement("li");
+                    const title = document.createElement("div");
+                    const meta = document.createElement("div");
+
+                    title.textContent =
+                        item.title || "Untitled";
+
+                    meta.className = "reference-meta";
+
+                    const authors = Array.isArray(item.authors)
+                        ? item.authors.filter(Boolean).join(", ")
+                        : "";
+
+                    meta.textContent = [
+                        authors,
+                        item.date,
+                        item.item_type
+                    ]
+                        .filter(Boolean)
+                        .join(" · ") || "No metadata available";
+
+                    li.append(title, meta);
+                    references.appendChild(li);
+                }
+
+                references.hidden = false;
+
+            } catch (error) {
+                resetReferences(
+                    "❌ " + error.message
+                );
+
+            } finally {
+                loadButton.disabled = !collectionSelect.value;
+            }
+        });
+
+        connectButton.addEventListener(
+            "click",
+            connectZotero
+        );
+
+        connectZotero();
+    })();
 </script>
 
 {% endblock %}

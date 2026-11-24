@@ -329,6 +329,72 @@ async def ask(request):
     )
 
 
+from zotero_integration import (
+    ZoteroConnectionError,
+    get_zotero_status,
+    get_zotero_collections,
+    get_zotero_collection_items,
+)
+
+
+@app.route("/zotero/status")
+async def zotero_status(request):
+    try:
+        result = await asyncio.to_thread(get_zotero_status)
+        return JSONResponse(result)
+
+    except ZoteroConnectionError as error:
+        return JSONResponse(
+            {"connected": False, "error": str(error)},
+            status_code=503,
+        )
+
+
+@app.route("/zotero/collections")
+async def zotero_collections(request):
+    try:
+        collections = await asyncio.to_thread(
+            get_zotero_collections
+        )
+
+        return JSONResponse({
+            "status": "ok",
+            "collections": collections,
+        })
+
+    except ZoteroConnectionError as error:
+        return JSONResponse(
+            {"status": "error", "error": str(error)},
+            status_code=503,
+        )
+
+
+@app.route("/zotero/collection-items")
+async def zotero_collection_items(request):
+    key = request.query_params.get("key", "")
+
+    try:
+        items = await asyncio.to_thread(
+            get_zotero_collection_items, key
+        )
+
+        return JSONResponse({
+            "status": "ok",
+            "items": items,
+        })
+
+    except ValueError as error:
+        return JSONResponse(
+            {"status": "error", "error": str(error)},
+            status_code=400,
+        )
+
+    except ZoteroConnectionError as error:
+        return JSONResponse(
+            {"status": "error", "error": str(error)},
+            status_code=503,
+        )
+
 @app.route("/settings")
 async def settings(request):
     return templates.TemplateResponse(
