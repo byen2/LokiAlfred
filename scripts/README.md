@@ -63,7 +63,7 @@ Alfred/src-tauri/target/release/bundle/dmg/*.dmg
 
 - **`.venv-build` 會被沿用**：腳本發現 `.venv-build` 已經存在時，會直接沿用，不會改用新指定的 `PYTHON_BIN`。換 Python 版本前要先執行 `rm -rf .venv-build`。
 - **8001 埠不能被占用**：腳本會啟動打包好的後端做冒煙測試。執行前請參考下方「[確認 8001 埠沒有被占用](#確認-8001-埠沒有被占用)」。
-- **Finder 權限**：建立 DMG 時，macOS 可能會詢問是否允許 Terminal 控制 Finder，請按允許。這一步是用來排列 DMG 視窗裡的圖示。
+- **Finder 排版預設跳過**：腳本預設用 `CI=true` 建置，會跳過用 AppleScript 控制 Finder 排列 DMG 視窗的步驟，不需要 Finder 權限，遠端也能跑。DMG 內容（`.app` 和 Applications 捷徑）不受影響，只是打開時沒有排好的版面。想要排好的版面，先在本機允許 Terminal 控制 Finder（系統設定 → 隱私權與安全性 → 自動化），再執行 `CI=false ./scripts/build_dmg.sh`。
 - **Python 的來源會影響相容性**：pyenv 和 Homebrew 的 Python 是在本機編譯的，打出來的 App 可能只能在相同或更新版本的 macOS 上執行。自己測試沒問題，正式發佈請改用 python.org 的版本。
 - **只會產出本機的架構**：在 Apple Silicon 上打包出來的是 arm64，Intel Mac 無法執行。
 

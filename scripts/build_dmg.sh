@@ -4,6 +4,7 @@
 #
 # Usage (from the repo root):
 #   ./scripts/build_dmg.sh
+#   CI=false ./scripts/build_dmg.sh   # also lay out the DMG window via Finder
 #
 # Output:
 #   Alfred/src-tauri/target/release/bundle/dmg/*.dmg
@@ -127,8 +128,15 @@ step "Building .app and .dmg (ad-hoc signed)"
 # ------------------------------------------------------------
 # signingIdentity "-" = ad-hoc signature: no Apple account needed,
 # required for the app to run on Apple Silicon.
-# Note: the DMG step drives Finder via AppleScript to lay out the window.
-# macOS may ask to allow Terminal to control Finder - click OK.
+# CI=true (the default here) makes Tauri pass --skip-jenkins to
+# bundle_dmg.sh, skipping the AppleScript that drives Finder to lay out
+# the DMG window. That step needs the "Terminal -> Finder" Automation
+# permission, which can't be granted remotely (error -1743). The DMG
+# still contains the .app and the Applications link; only the window
+# layout is skipped. Run with CI=false (after allowing Terminal to
+# control Finder) for the laid-out window. CI is unset in that case,
+# since some tools only check whether CI is set, not its value.
+if [[ "${CI:-true}" == "false" ]]; then unset CI; else export CI=true; fi
 npm run tauri build -- \
     --bundles app,dmg \
     --config '{"bundle":{"macOS":{"signingIdentity":"-"}}}'
