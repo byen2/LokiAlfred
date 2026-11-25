@@ -33,6 +33,9 @@ need()    { command -v "$1" >/dev/null 2>&1 || fail "'$1' not found. $2"; }
 step "Checking environment"
 # ------------------------------------------------------------
 [[ "$(uname -s)" == "Darwin" ]] || fail "This script must run on macOS."
+# Only Apple Silicon (arm64) builds are supported. Under Rosetta,
+# uname -m reports x86_64, so this also catches an x86_64 Terminal.
+[[ "$(uname -m)" == "arm64" ]] || fail "This script builds for Apple Silicon only. Run it on an Apple Silicon Mac in a native (non-Rosetta) shell; uname -m reports '$(uname -m)'."
 xcode-select -p >/dev/null 2>&1 || fail "Xcode Command Line Tools missing. Run: xcode-select --install"
 
 need "$PYTHON_BIN" "Install Python 3 (python.org installer recommended)."
@@ -53,8 +56,12 @@ if [[ "$PY_PATH" == /opt/homebrew/* || "$PY_PATH" == /usr/local/Cellar/* ]]; the
     echo "  PYTHON_BIN=/Library/Frameworks/Python.framework/Versions/3.X/bin/python3 ./scripts/build_dmg.sh"
 fi
 
+PY_ARCH="$("$PYTHON_BIN" -c 'import platform; print(platform.machine())')"
+[[ "$PY_ARCH" == "arm64" ]] || fail "Python at $PY_PATH runs as '$PY_ARCH', expected arm64. Use an arm64 or universal2 Python (python.org installer, pyenv, or Homebrew under /opt/homebrew)."
+
 TARGET_TRIPLE="$(rustc -vV | sed -n 's/^host: //p')"
 [[ -n "$TARGET_TRIPLE" ]] || fail "Could not determine Rust host target."
+[[ "$TARGET_TRIPLE" == "aarch64-apple-darwin" ]] || fail "Rust host target is '$TARGET_TRIPLE', expected aarch64-apple-darwin. Install the arm64 Rust toolchain (rustup default stable-aarch64-apple-darwin)."
 echo "Target  : $TARGET_TRIPLE"
 
 # ------------------------------------------------------------

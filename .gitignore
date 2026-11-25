@@ -30,7 +30,6 @@ settings.json
 
 # Logs
 *.log
-!build.log
 
 # Folders
 Alfred/src-tauri/binaries/

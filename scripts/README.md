@@ -59,13 +59,22 @@ Alfred/src-tauri/target/release/bundle/macos/loki-alfred.app
 Alfred/src-tauri/target/release/bundle/dmg/*.dmg
 ```
 
+**舊的 DMG 不會被自動清掉。** DMG 檔名裡有版本號（例如 `loki-alfred_0.1.0_aarch64.dmg`）。版本號沒變時，新檔會直接覆蓋舊檔；改過版本號的話，`bundle/dmg/` 裡會同時留著新舊兩個。腳本結尾印出的 `DMG :` 只會挑其中一個，不一定是最新的。改版本號後，建置前先清掉舊的：
+
+```bash
+rm -rf Alfred/src-tauri/target/release/bundle/dmg
+```
+
 ### 注意事項
 
 - **`.venv-build` 會被沿用**：腳本發現 `.venv-build` 已經存在時，會直接沿用，不會改用新指定的 `PYTHON_BIN`。換 Python 版本前要先執行 `rm -rf .venv-build`。
 - **8001 埠不能被占用**：腳本會啟動打包好的後端做冒煙測試。執行前請參考下方「[確認 8001 埠沒有被占用](#確認-8001-埠沒有被占用)」。
 - **Finder 排版預設跳過**：腳本預設用 `CI=true` 建置，會跳過用 AppleScript 控制 Finder 排列 DMG 視窗的步驟，不需要 Finder 權限，遠端也能跑。DMG 內容（`.app` 和 Applications 捷徑）不受影響，只是打開時沒有排好的版面。想要排好的版面，先在本機允許 Terminal 控制 Finder（系統設定 → 隱私權與安全性 → 自動化），再執行 `CI=false ./scripts/build_dmg.sh`。
 - **Python 的來源會影響相容性**：pyenv 和 Homebrew 的 Python 是在本機編譯的，打出來的 App 可能只能在相同或更新版本的 macOS 上執行。自己測試沒問題，正式發佈請改用 python.org 的版本。
-- **只會產出本機的架構**：在 Apple Silicon 上打包出來的是 arm64，Intel Mac 無法執行。
+- **只支援 Apple Silicon（arm64）**：產出的 App 只能在 Apple Silicon Mac 上執行，不支援 Intel Mac。腳本一開始會檢查三件事，任何一項不是 arm64 就會停止：
+  - Mac 本身（`uname -m`）。在 Rosetta 模式的 Terminal 裡也會顯示 x86_64，所以同樣會被擋下。
+  - `PYTHON_BIN` 指定的 Python。`/usr/local` 底下的 Intel 版 Homebrew Python 不能用。
+  - Rust 工具鏈（必須是 `aarch64-apple-darwin`）。
 
 ### 確認 8001 埠沒有被占用
 
