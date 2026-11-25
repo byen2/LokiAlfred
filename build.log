@@ -1,0 +1,834 @@
+
+==> Checking environment
+macOS   : 27.2.1 (arm64)
+Python  : Python 3.13.18 at /Users/agent/.pyenv/versions/3.13.18/bin/python3
+Node    : v26.13.1
+Rust    : rustc 1.100.0 (0ef1bc386 2026-11-09) (Homebrew)
+Target  : aarch64-apple-darwin
+
+==> Setting up Python build environment (/Users/agent/Desktop/LokiAlfred/.venv-build)
+Collecting starlette==0.50.0 (from -r requirements.txt (line 1))
+  Downloading starlette-0.50.0-py3-none-any.whl.metadata (6.3 kB)
+Collecting uvicorn==0.38.0 (from -r requirements.txt (line 2))
+  Downloading uvicorn-0.38.0-py3-none-any.whl.metadata (6.8 kB)
+Collecting Jinja2==3.1.6 (from -r requirements.txt (line 3))
+  Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting requests==2.32.3 (from -r requirements.txt (line 4))
+  Downloading requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
+Collecting PyMuPDF (from -r requirements.txt (line 5))
+  Downloading pymupdf-2.1-cp311-abi3-macosx_11_0_arm64.whl.metadata (26 kB)
+Collecting pyinstaller==6.20.0 (from -r requirements.txt (line 6))
+  Downloading pyinstaller-6.20.0-py3-none-macosx_10_13_universal2.whl.metadata (8.5 kB)
+Collecting anyio<5,>=3.6.2 (from starlette==0.50.0->-r requirements.txt (line 1))
+  Downloading anyio-4.16.0-py3-none-any.whl.metadata (4.7 kB)
+Collecting click>=7.0 (from uvicorn==0.38.0->-r requirements.txt (line 2))
+  Downloading click-8.5.1-py3-none-any.whl.metadata (2.6 kB)
+Collecting h11>=0.8 (from uvicorn==0.38.0->-r requirements.txt (line 2))
+  Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting MarkupSafe>=2.0 (from Jinja2==3.1.6->-r requirements.txt (line 3))
+  Downloading markupsafe-3.0.4-cp313-cp313-macosx_11_0_arm64.whl.metadata (2.7 kB)
+Collecting charset-normalizer<4,>=2 (from requests==2.32.3->-r requirements.txt (line 4))
+  Downloading charset_normalizer-3.5.3-cp313-cp313-macosx_10_13_universal2.whl.metadata (43 kB)
+Collecting idna<4,>=2.5 (from requests==2.32.3->-r requirements.txt (line 4))
+  Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+Collecting urllib3<3,>=1.21.1 (from requests==2.32.3->-r requirements.txt (line 4))
+  Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+Collecting certifi>=2017.4.17 (from requests==2.32.3->-r requirements.txt (line 4))
+  Downloading certifi-2026.11.20-py3-none-any.whl.metadata (2.5 kB)
+Collecting altgraph (from pyinstaller==6.20.0->-r requirements.txt (line 6))
+  Downloading altgraph-0.17.5-py2.py3-none-any.whl.metadata (7.5 kB)
+Collecting macholib>=1.8 (from pyinstaller==6.20.0->-r requirements.txt (line 6))
+  Downloading macholib-1.16.4-py2.py3-none-any.whl.metadata (12 kB)
+Collecting packaging>=22.0 (from pyinstaller==6.20.0->-r requirements.txt (line 6))
+  Downloading packaging-26.4-py3-none-any.whl.metadata (3.5 kB)
+Collecting pyinstaller-hooks-contrib>=2026.4 (from pyinstaller==6.20.0->-r requirements.txt (line 6))
+  Downloading pyinstaller_hooks_contrib-2026.10-py3-none-any.whl.metadata (16 kB)
+Collecting setuptools>=42.0.0 (from pyinstaller==6.20.0->-r requirements.txt (line 6))
+  Downloading setuptools-84.2.1-py3-none-any.whl.metadata (6.6 kB)
+Collecting typing_extensions>=4.16.0 (from anyio<5,>=3.6.2->starlette==0.50.0->-r requirements.txt (line 1))
+  Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting networkx (from PyMuPDF->-r requirements.txt (line 5))
+  Downloading networkx-3.7-py3-none-any.whl.metadata (6.7 kB)
+Collecting numpy (from PyMuPDF->-r requirements.txt (line 5))
+  Downloading numpy-2.5.5-cp313-cp313-macosx_14_0_arm64.whl.metadata (6.6 kB)
+Collecting onnxruntime (from PyMuPDF->-r requirements.txt (line 5))
+  Downloading onnxruntime-1.32.0-cp313-cp313-macosx_14_0_arm64.whl.metadata (5.8 kB)
+Collecting pyyaml (from PyMuPDF->-r requirements.txt (line 5))
+  Downloading pyyaml-6.0.4-cp313-cp313-macosx_11_0_arm64.whl.metadata (2.3 kB)
+Collecting pymupdf-layout==2.1 (from PyMuPDF->-r requirements.txt (line 5))
+  Downloading pymupdf_layout-2.1-py3-none-any.whl.metadata (657 bytes)
+Collecting psutil (from PyMuPDF->-r requirements.txt (line 5))
+  Using cached psutil-7.2.2-cp36-abi3-macosx_11_0_arm64.whl.metadata (22 kB)
+Collecting tabulate (from PyMuPDF->-r requirements.txt (line 5))
+  Downloading tabulate-0.10.0-py3-none-any.whl.metadata (40 kB)
+Collecting pymupdf4llm==2.1 (from PyMuPDF->-r requirements.txt (line 5))
+  Downloading pymupdf4llm-2.1-py3-none-any.whl.metadata (648 bytes)
+Collecting flatbuffers (from onnxruntime->PyMuPDF->-r requirements.txt (line 5))
+  Downloading flatbuffers-25.12.19-py2.py3-none-any.whl.metadata (1.0 kB)
+Collecting protobuf>=4.25.8 (from onnxruntime->PyMuPDF->-r requirements.txt (line 5))
+  Downloading protobuf-7.36.2-cp310-abi3-macosx_10_9_universal2.whl.metadata (595 bytes)
+Downloading starlette-0.50.0-py3-none-any.whl (74 kB)
+Downloading uvicorn-0.38.0-py3-none-any.whl (68 kB)
+Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+Downloading pyinstaller-6.20.0-py3-none-macosx_10_13_universal2.whl (1.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.0/1.0 MB 14.5 MB/s  0:00:00
+Downloading anyio-4.16.0-py3-none-any.whl (134 kB)
+Downloading charset_normalizer-3.5.3-cp313-cp313-macosx_10_13_universal2.whl (386 kB)
+Downloading idna-3.20-py3-none-any.whl (69 kB)
+Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+Downloading pymupdf-2.1-cp311-abi3-macosx_11_0_arm64.whl (67.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 67.2/67.2 MB 87.3 MB/s  0:00:00
+Downloading pymupdf_layout-2.1-py3-none-any.whl (1.0 kB)
+Downloading pymupdf4llm-2.1-py3-none-any.whl (1.0 kB)
+Downloading certifi-2026.11.20-py3-none-any.whl (127 kB)
+Downloading click-8.5.1-py3-none-any.whl (126 kB)
+Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Downloading macholib-1.16.4-py2.py3-none-any.whl (38 kB)
+Downloading altgraph-0.17.5-py2.py3-none-any.whl (21 kB)
+Downloading markupsafe-3.0.4-cp313-cp313-macosx_11_0_arm64.whl (12 kB)
+Downloading packaging-26.4-py3-none-any.whl (140 kB)
+Downloading pyinstaller_hooks_contrib-2026.10-py3-none-any.whl (463 kB)
+Downloading setuptools-84.2.1-py3-none-any.whl (876 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 876.3/876.3 kB 53.5 MB/s  0:00:00
+Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Downloading networkx-3.7-py3-none-any.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 81.2 MB/s  0:00:00
+Downloading numpy-2.5.5-cp313-cp313-macosx_14_0_arm64.whl (5.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.5/5.5 MB 94.7 MB/s  0:00:00
+Downloading onnxruntime-1.32.0-cp313-cp313-macosx_14_0_arm64.whl (22.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 22.5/22.5 MB 95.4 MB/s  0:00:00
+Downloading protobuf-7.36.2-cp310-abi3-macosx_10_9_universal2.whl (456 kB)
+Downloading flatbuffers-25.12.19-py2.py3-none-any.whl (26 kB)
+Using cached psutil-7.2.2-cp36-abi3-macosx_11_0_arm64.whl (129 kB)
+Downloading pyyaml-6.0.4-cp313-cp313-macosx_11_0_arm64.whl (179 kB)
+Downloading tabulate-0.10.0-py3-none-any.whl (39 kB)
+Installing collected packages: flatbuffers, altgraph, urllib3, typing_extensions, tabulate, setuptools, pyyaml, psutil, protobuf, packaging, numpy, networkx, MarkupSafe, macholib, idna, h11, click, charset-normalizer, certifi, uvicorn, requests, pyinstaller-hooks-contrib, onnxruntime, Jinja2, anyio, starlette, pyinstaller, pymupdf4llm, pymupdf-layout, PyMuPDF
+
+Successfully installed Jinja2-3.1.6 MarkupSafe-3.0.4 PyMuPDF-2.1 altgraph-0.17.5 anyio-4.16.0 certifi-2026.11.20 charset-normalizer-3.5.3 click-8.5.1 flatbuffers-25.12.19 h11-0.16.0 idna-3.20 macholib-1.16.4 networkx-3.7 numpy-2.5.5 onnxruntime-1.32.0 packaging-26.4 protobuf-7.36.2 psutil-7.2.2 pyinstaller-6.20.0 pyinstaller-hooks-contrib-2026.10 pymupdf-layout-2.1 pymupdf4llm-2.1 pyyaml-6.0.4 requests-2.32.3 setuptools-84.2.1 starlette-0.50.0 tabulate-0.10.0 typing_extensions-4.16.0 urllib3-2.8.0 uvicorn-0.38.0
+✓ Python dependencies installed
+
+==> Building Python backend (PyInstaller)
+40 INFO: PyInstaller: 6.20.0, contrib hooks: 2026.10
+40 INFO: Python: 3.13.18
+50 INFO: Platform: macOS-27.2.1-arm64-arm-64bit-Mach-O
+50 INFO: Python environment: /Users/agent/Desktop/LokiAlfred/.venv-build
+53 INFO: Removing temporary files and cleaning cache in /Users/agent/Library/Application Support/pyinstaller
+54 INFO: Module search paths (PYTHONPATH):
+['/Users/agent/Desktop/LokiAlfred',
+ '/Users/agent/.pyenv/versions/3.13.18/lib/python313.zip',
+ '/Users/agent/.pyenv/versions/3.13.18/lib/python3.13',
+ '/Users/agent/.pyenv/versions/3.13.18/lib/python3.13/lib-dynload',
+ '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages',
+ '/Users/agent/Desktop/LokiAlfred']
+307 INFO: Appending 'datas' from .spec
+308 INFO: checking Analysis
+308 INFO: Building Analysis because Analysis-00.toc is non existent
+308 INFO: Looking for Python shared library...
+311 INFO: Using Python shared library: /Users/agent/.pyenv/versions/3.13.18/lib/libpython3.13.dylib
+311 INFO: Running Analysis Analysis-00.toc
+311 INFO: Target bytecode optimization level: 0
+311 INFO: Initializing module dependency graph...
+312 INFO: Initializing module graph hook caches...
+318 INFO: Analyzing modules for base_library.zip ...
+723 INFO: Processing standard module hook 'hook-encodings.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/hooks'
+1839 INFO: Processing standard module hook 'hook-pickle.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/hooks'
+2390 INFO: Processing standard module hook 'hook-heapq.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/hooks'
+2707 INFO: Caching module dependency graph...
+2728 INFO: Analyzing /Users/agent/Desktop/LokiAlfred/backend.py
+2729 INFO: Processing standard module hook 'hook-uvicorn.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+3468 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/hooks'
+3601 INFO: Processing standard module hook 'hook-xml.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/hooks'
+3783 INFO: Processing standard module hook 'hook-sysconfig.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/hooks'
+3792 INFO: Processing standard module hook 'hook-_osx_support.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/hooks'
+3795 INFO: Processing standard module hook 'hook-_ctypes.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/hooks'
+4261 INFO: Processing standard module hook 'hook-platform.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/hooks'
+4307 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+4307 INFO: SetuptoolsInfo: initializing cached setuptools info...
+4578 INFO: Processing standard module hook 'hook-difflib.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/hooks'
+5003 INFO: Processing standard module hook 'hook-anyio.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+5523 INFO: Processing standard module hook 'hook-jinja2.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+6426 INFO: Processing standard module hook 'hook-pymupdf.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+7777 INFO: Processing module hooks (post-graph stage)...
+7949 INFO: Performing binary vs. data reclassification (121 entries)
+7961 INFO: Looking for ctypes DLLs
+7976 INFO: Analyzing run-time hooks ...
+7977 INFO: Including run-time hook 'pyi_rth_inspect.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+7979 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+7980 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from '/Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+7986 INFO: Creating base_library.zip...
+7998 INFO: Looking for dynamic libraries
+8073 INFO: Warnings written to /Users/agent/Desktop/LokiAlfred/build/backend/warn-backend.txt
+8084 INFO: Graph cross-reference written to /Users/agent/Desktop/LokiAlfred/build/backend/xref-backend.html
+8128 INFO: checking PYZ
+8128 INFO: Building PYZ because PYZ-00.toc is non existent
+8128 INFO: Building PYZ (ZlibArchive) /Users/agent/Desktop/LokiAlfred/build/backend/PYZ-00.pyz
+8505 INFO: Building PYZ (ZlibArchive) /Users/agent/Desktop/LokiAlfred/build/backend/PYZ-00.pyz completed successfully.
+8508 INFO: EXE target arch: arm64
+8509 INFO: Code signing identity: None
+8511 INFO: checking PKG
+8511 INFO: Building PKG because PKG-00.toc is non existent
+8511 INFO: Building PKG (CArchive) backend.pkg
+17173 INFO: Building PKG (CArchive) backend.pkg completed successfully.
+17176 INFO: Bootloader /Users/agent/Desktop/LokiAlfred/.venv-build/lib/python3.13/site-packages/PyInstaller/bootloader/Darwin-64bit/run
+17176 INFO: checking EXE
+17176 INFO: Building EXE because EXE-00.toc is non existent
+17176 INFO: Building EXE from EXE-00.toc
+17176 INFO: Copying bootloader EXE to /Users/agent/Desktop/LokiAlfred/dist/backend
+17176 INFO: Converting EXE to target arch (arm64)
+17678 INFO: Removing signature(s) from EXE
+17754 INFO: Modifying Mach-O image UUID(s) in EXE
+17802 INFO: Appending PKG archive to EXE
+17825 INFO: Fixing EXE headers for code signing
+17828 INFO: Re-signing the EXE
+17910 INFO: Building EXE from EXE-00.toc completed successfully.
+17913 INFO: Build complete! The results are available in: /Users/agent/Desktop/LokiAlfred/dist
+✓ Backend built: /Users/agent/Desktop/LokiAlfred/dist/backend
+
+==> Smoke-testing backend on http://127.0.0.1:8001
+✓ Backend smoke test passed
+
+==> Preparing Tauri sidecar
+✓ Sidecar: /Users/agent/Desktop/LokiAlfred/Alfred/src-tauri/binaries/backend-aarch64-apple-darwin
+
+==> Installing Node dependencies
+
+added 19 packages, and audited 20 packages in 1s
+
+7 packages are looking for funding
+  run `npm fund` for details
+
+4 high severity vulnerabilities
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+npm warn install-scripts 2 packages have install scripts not yet covered by allowScripts:
+npm warn install-scripts   esbuild@0.25.12 (postinstall: node install.js)
+npm warn install-scripts   fsevents@2.3.3 (install: (install scripts present))
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+npm notice
+npm notice New major version of npm available! 11.20.0 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+
+==> Building .app and .dmg (ad-hoc signed)
+
+> loki-alfred@0.1.0 tauri
+> tauri build --bundles app,dmg --config {"bundle":{"macOS":{"signingIdentity":"-"}}}
+
+        Info Looking up installed tauri packages to check mismatched versions...
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded autocfg v1.5.0
+  Downloaded darling_core v0.23.0
+  Downloaded alloc-stdlib v0.2.2
+  Downloaded adler2 v2.0.1
+  Downloaded subtle v2.6.1
+  Downloaded cfg-if v1.0.4
+  Downloaded string_cache_codegen v0.6.1
+  Downloaded alloc-no-stdlib v2.0.4
+  Downloaded atomic-waker v1.1.2
+  Downloaded generic-array v0.14.7
+  Downloaded strsim v0.11.1
+  Downloaded ctor v0.8.0
+  Downloaded futures-io v0.3.32
+  Downloaded dirs v6.0.0
+  Downloaded futures-task v0.3.32
+  Downloaded swift-rs v1.0.7
+  Downloaded core-graphics-types v0.2.0
+  Downloaded http-body v1.0.1
+  Downloaded futures-macro v0.3.32
+  Downloaded foreign-types v0.5.0
+  Downloaded foreign-types-shared v0.3.1
+  Downloaded crypto-common v0.1.7
+  Downloaded ctor-proc-macro v0.0.7
+  Downloaded equivalent v1.0.2
+  Downloaded futures-sink v0.3.32
+  Downloaded form_urlencoded v1.2.2
+  Downloaded embed_plist v1.2.2
+  Downloaded dyn-clone v1.0.20
+  Downloaded foreign-types-macros v0.2.3
+  Downloaded block-buffer v0.10.4
+  Downloaded dirs-sys v0.5.0
+  Downloaded stable_deref_trait v1.2.1
+  Downloaded time-core v0.1.8
+  Downloaded unic-ucd-version v0.9.0
+  Downloaded fnv v1.0.7
+  Downloaded dtor v0.3.0
+  Downloaded hex v0.4.3
+  Downloaded dtor-proc-macro v0.0.6
+  Downloaded dpi v0.1.2
+  Downloaded dunce v1.0.5
+  Downloaded errno v0.3.14
+  Downloaded siphasher v1.0.3
+  Downloaded dtoa-short v0.3.5
+  Downloaded darling_macro v0.23.0
+  Downloaded cssparser-macros v0.6.1
+  Downloaded heck v0.5.0
+  Downloaded cpufeatures v0.2.17
+  Downloaded tinyvec_macros v0.1.1
+  Downloaded sigchld v0.2.4
+  Downloaded zerofrom v0.1.7
+  Downloaded shared_child v1.1.1
+  Downloaded try-lock v0.2.5
+  Downloaded serde_urlencoded v0.7.1
+  Downloaded hyper-tls v0.6.0
+  Downloaded cargo-platform v0.1.9
+  Downloaded bs58 v0.5.1
+  Downloaded bitflags v1.3.2
+  Downloaded byteorder v1.5.0
+  Downloaded dtoa v1.0.11
+  Downloaded core-foundation v0.10.1
+  Downloaded bit-set v0.8.0
+  Downloaded bit-vec v0.8.0
+  Downloaded glob v0.3.3
+  Downloaded digest v0.10.7
+  Downloaded futures-core v0.3.32
+  Downloaded fdeflate v0.3.7
+  Downloaded find-msvc-tools v0.1.9
+  Downloaded embed-resource v3.0.9
+  Downloaded foldhash v0.2.0
+  Downloaded unic-char-property v0.9.0
+  Downloaded fastrand v2.4.1
+  Downloaded deranged v0.5.8
+  Downloaded sync_wrapper v1.0.2
+  Downloaded cargo_metadata v0.19.2
+  Downloaded core-foundation v0.9.4
+  Downloaded markup5ever v0.38.0
+  Downloaded phf_generator v0.13.1
+  Downloaded ref-cast-impl v1.0.25
+  Downloaded idna_adapter v1.2.2
+  Downloaded zerofrom-derive v0.1.7
+  Downloaded cookie v0.18.1
+  Downloaded core-foundation-sys v0.8.7
+  Downloaded crc32fast v1.5.0
+  Downloaded cargo_toml v0.22.3
+  Downloaded tower-service v0.3.3
+  Downloaded camino v1.2.2
+  Downloaded erased-serde v0.4.10
+  Downloaded core-graphics v0.25.0
+  Downloaded block2 v0.6.2
+  Downloaded displaydoc v0.2.5
+  Downloaded futures-channel v0.3.32
+  Downloaded http-body-util v0.1.3
+  Downloaded crossbeam-utils v0.8.21
+  Downloaded anyhow v1.0.102
+  Downloaded darling v0.23.0
+  Downloaded utf8_iter v1.0.4
+  Downloaded serde_derive_internals v0.29.1
+  Downloaded cfb v0.7.3
+  Downloaded tower-layer v0.3.3
+  Downloaded getrandom v0.4.2
+  Downloaded getrandom v0.2.17
+  Downloaded getrandom v0.3.4
+  Downloaded once_cell v1.21.4
+  Downloaded parking_lot_core v0.9.12
+  Downloaded yoke-derive v0.8.2
+  Downloaded ref-cast v1.0.25
+  Downloaded cssparser v0.36.0
+  Downloaded want v0.3.1
+  Downloaded log v0.4.29
+  Downloaded num-traits v0.2.19
+  Downloaded rustls-pki-types v1.15.1
+  Downloaded dispatch2 v0.3.1
+  Downloaded httparse v1.10.1
+  Downloaded mime v0.3.17
+  Downloaded serialize-to-javascript-impl v0.1.2
+  Downloaded untrusted v0.9.0
+  Downloaded base64 v0.22.1
+  Downloaded bitflags v2.11.1
+  Downloaded bytes v1.11.1
+  Downloaded icu_locale_core v2.2.0
+  Downloaded serde_core v1.0.228
+  Downloaded json-patch v3.0.1
+  Downloaded rustc-hash v2.1.2
+  Downloaded crossbeam-channel v0.5.15
+  Downloaded dom_query v0.27.0
+  Downloaded html5ever v0.38.0
+  Downloaded utf-8 v0.7.6
+  Downloaded derive_more v2.1.1
+  Downloaded itoa v1.0.18
+  Downloaded num-conv v0.2.1
+  Downloaded base64 v0.21.7
+  Downloaded serde-untagged v0.1.9
+  Downloaded serde_derive v1.0.228
+  Downloaded flate2 v1.1.9
+  Downloaded http v1.4.0
+  Downloaded hyper-rustls v0.27.9
+  Downloaded hashbrown v0.12.3
+  Downloaded unic-char-range v0.9.0
+  Downloaded unic-ucd-ident v0.9.0
+  Downloaded cc v1.2.62
+  Downloaded derive_more-impl v2.1.1
+  Downloaded schemars v1.2.1
+  Downloaded serde_spanned v1.1.1
+  Downloaded version_check v0.9.5
+  Downloaded indexmap v2.14.0
+  Downloaded memchr v2.8.0
+  Downloaded ryu v1.0.23
+  Downloaded parking_lot v0.12.5
+  Downloaded miniz_oxide v0.8.9
+  Downloaded png v0.17.16
+  Downloaded schemars v0.9.0
+  Downloaded objc2-exception-helper v0.1.1
+  Downloaded unic-common v0.9.0
+  Downloaded security-framework v3.7.0
+  Downloaded objc2-io-surface v0.3.2
+  Downloaded hashbrown v0.17.1
+  Downloaded h2 v0.4.19
+  Downloaded futures-util v0.3.32
+  Downloaded keyboard-types v0.7.0
+  Downloaded brotli-decompressor v5.0.0
+  Downloaded regex v1.12.3
+  Downloaded serde_json v1.0.149
+  Downloaded percent-encoding v2.3.2
+  Downloaded ident_case v1.0.1
+  Downloaded simd-adler32 v0.3.9
+  Downloaded servo_arc v0.4.3
+  Downloaded slab v0.4.12
+  Downloaded thiserror-impl v2.0.18
+  Downloaded toml_writer v1.1.1+spec-1.1.0
+  Downloaded typeid v1.0.3
+  Downloaded ico v0.5.0
+  Downloaded objc2-web-kit v0.3.2
+  Downloaded serde_with v3.20.0
+  Downloaded string_cache v0.9.0
+  Downloaded ipnet v2.12.0
+  Downloaded aho-corasick v1.1.4
+  Downloaded objc2-core-foundation v0.3.2
+  Downloaded signal-hook-registry v1.4.8
+  Downloaded serde_with_macros v3.20.0
+  Downloaded thiserror-impl v1.0.69
+  Downloaded infer v0.19.0
+  Downloaded phf_macros v0.13.1
+  Downloaded shlex v1.3.0
+  Downloaded muda v0.19.1
+  Downloaded icu_normalizer v2.2.0
+  Downloaded chrono v0.4.44
+  Downloaded time-macros v0.2.27
+  Downloaded toml_datetime v1.1.1+spec-1.1.0
+  Downloaded tinystr v0.8.3
+  Downloaded tokio-native-tls v0.3.1
+  Downloaded toml_datetime v0.7.5+spec-1.1.0
+  Downloaded urlpattern v0.3.0
+  Downloaded web_atoms v0.2.4
+  Downloaded icu_properties_data v2.2.0
+  Downloaded system-configuration v0.7.0
+  Downloaded walkdir v2.5.0
+  Downloaded selectors v0.36.1
+  Downloaded png v0.18.1
+  Downloaded tauri-plugin v2.6.1
+  Downloaded tokio-rustls v0.26.5
+  Downloaded writeable v0.6.3
+  Downloaded pin-project-lite v0.2.17
+  Downloaded rustc_version v0.4.1
+  Downloaded security-framework-sys v2.17.0
+  Downloaded reqwest v0.12.28
+  Downloaded synstructure v0.13.2
+  Downloaded system-configuration-sys v0.6.0
+  Downloaded zerovec-derive v0.11.3
+  Downloaded same-file v1.0.6
+  Downloaded objc2 v0.6.4
+  Downloaded tauri-winres v0.3.6
+  Downloaded lock_api v0.4.14
+  Downloaded open v5.3.4
+  Downloaded thiserror v1.0.69
+  Downloaded icu_properties v2.2.0
+  Downloaded litemap v0.8.2
+  Downloaded objc2-encode v4.1.0
+  Downloaded pathdiff v0.2.3
+  Downloaded phf v0.13.1
+  Downloaded precomputed-hash v0.1.1
+  Downloaded mio v1.2.0
+  Downloaded zeroize v1.9.0
+  Downloaded zmij v1.0.21
+  Downloaded tauri-build v2.6.1
+  Downloaded tauri-runtime v2.11.1
+  Downloaded tracing-attributes v0.1.31
+  Downloaded toml_parser v1.1.2+spec-1.1.0
+  Downloaded yoke v0.8.2
+  Downloaded sha2 v0.10.9
+  Downloaded tauri-macros v2.6.1
+  Downloaded idna v1.1.0
+  Downloaded unicode-ident v1.0.24
+  Downloaded potential_utf v0.1.5
+  Downloaded quote v1.0.45
+  Downloaded scopeguard v1.2.0
+  Downloaded serde_repr v0.1.20
+  Downloaded new_debug_unreachable v1.0.6
+  Downloaded objc2-foundation v0.3.2
+  Downloaded powerfmt v0.2.0
+  Downloaded tempfile v3.27.0
+  Downloaded objc2-core-graphics v0.3.2
+  Downloaded semver v1.0.28
+  Downloaded regex-syntax v0.8.10
+  Downloaded rustls v0.23.45
+  Downloaded signal-hook v0.3.18
+  Downloaded toml v1.1.2+spec-1.1.0
+  Downloaded jsonptr v0.6.3
+  Downloaded serde v1.0.228
+  Downloaded icu_collections v2.2.0
+  Downloaded schemars_derive v0.8.22
+  Downloaded smallvec v1.15.1
+  Downloaded tauri-plugin-opener v2.5.4
+  Downloaded thiserror v2.0.18
+  Downloaded tinyvec v1.11.0
+  Downloaded uuid v1.23.1
+  Downloaded brotli v8.0.2
+  Downloaded rustix v1.1.4
+  Downloaded regex-automata v0.4.14
+  Downloaded tendril v0.5.0
+  Downloaded toml v0.9.12+spec-1.1.0
+  Downloaded os_pipe v1.2.3
+  Downloaded tauri-codegen v2.6.1
+  Downloaded tray-icon v0.23.1
+  Downloaded serialize-to-javascript v0.1.2
+  Downloaded option-ext v0.2.0
+  Downloaded icu_provider v2.2.0
+  Downloaded phf_codegen v0.13.1
+  Downloaded tracing-core v0.1.36
+  Downloaded libc v0.2.186
+  Downloaded raw-window-handle v0.6.2
+  Downloaded phf_shared v0.13.1
+  Downloaded indexmap v1.9.3
+  Downloaded proc-macro2 v1.0.106
+  Downloaded tauri-runtime-wry v2.11.1
+  Downloaded encoding_rs v0.8.35
+  Downloaded plist v1.9.0
+  Downloaded iana-time-zone v0.1.65
+  Downloaded native-tls v0.2.18
+  Downloaded socket2 v0.6.3
+  Downloaded zerotrie v0.2.4
+  Downloaded url v2.5.8
+  Downloaded schemars v0.8.22
+  Downloaded objc2-app-kit v0.3.2
+  Downloaded unicode-segmentation v1.13.2
+  Downloaded rustls-webpki v0.103.15
+  Downloaded typenum v1.20.0
+  Downloaded icu_normalizer_data v2.2.0
+  Downloaded tauri-plugin-shell v2.3.5
+  Downloaded tower v0.5.3
+  Downloaded zerovec v0.11.6
+  Downloaded hyper-util v0.1.20
+  Downloaded tauri-utils v2.9.1
+  Downloaded tokio-util v0.7.18
+  Downloaded tower-http v0.6.10
+  Downloaded ring v0.17.14
+  Downloaded hyper v1.9.0
+  Downloaded winnow v0.7.15
+  Downloaded winnow v1.0.2
+  Downloaded wry v0.55.1
+  Downloaded quick-xml v0.39.4
+  Downloaded time v0.3.47
+  Downloaded syn v2.0.117
+  Downloaded tauri v2.11.1
+  Downloaded tao v0.35.2
+  Downloaded tracing v0.1.44
+  Downloaded tokio v1.52.3
+  Downloaded window-vibrancy v0.6.0
+   Compiling proc-macro2 v1.0.106
+   Compiling quote v1.0.45
+   Compiling unicode-ident v1.0.24
+   Compiling libc v0.2.186
+   Compiling serde_core v1.0.228
+   Compiling icu_properties_data v2.2.0
+   Compiling icu_normalizer_data v2.2.0
+   Compiling siphasher v1.0.3
+   Compiling fastrand v2.4.1
+   Compiling zmij v1.0.21
+   Compiling stable_deref_trait v1.2.1
+   Compiling cfg-if v1.0.4
+   Compiling shlex v1.3.0
+   Compiling memchr v2.8.0
+   Compiling find-msvc-tools v0.1.9
+   Compiling smallvec v1.15.1
+   Compiling serde v1.0.228
+   Compiling itoa v1.0.18
+   Compiling getrandom v0.4.2
+   Compiling thiserror v2.0.18
+   Compiling typeid v1.0.3
+   Compiling num-conv v0.2.1
+   Compiling time-core v0.1.8
+   Compiling strsim v0.11.1
+   Compiling litemap v0.8.2
+   Compiling erased-serde v0.4.10
+   Compiling phf_shared v0.13.1
+   Compiling cc v1.2.62
+   Compiling serde_json v1.0.149
+   Compiling ident_case v1.0.1
+   Compiling thiserror v1.0.69
+   Compiling writeable v0.6.3
+   Compiling utf8_iter v1.0.4
+   Compiling parking_lot_core v0.9.12
+   Compiling phf_generator v0.13.1
+   Compiling scopeguard v1.2.0
+   Compiling anyhow v1.0.102
+   Compiling new_debug_unreachable v1.0.6
+   Compiling winnow v1.0.2
+   Compiling phf_codegen v0.13.1
+   Compiling lock_api v0.4.14
+   Compiling precomputed-hash v0.1.1
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling ctor-proc-macro v0.0.7
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling log v0.4.29
+   Compiling percent-encoding v2.3.2
+   Compiling utf-8 v0.7.6
+   Compiling autocfg v1.5.0
+   Compiling dtoa v1.0.11
+   Compiling bytes v1.11.1
+   Compiling dtoa-short v0.3.5
+   Compiling objc2-exception-helper v0.1.1
+   Compiling tendril v0.5.0
+   Compiling indexmap v1.9.3
+   Compiling form_urlencoded v1.2.2
+   Compiling selectors v0.36.1
+   Compiling aho-corasick v1.1.4
+   Compiling byteorder v1.5.0
+   Compiling objc2 v0.6.4
+   Compiling camino v1.2.2
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling unic-common v0.9.0
+   Compiling powerfmt v0.2.0
+   Compiling regex-syntax v0.8.10
+   Compiling unic-char-range v0.9.0
+   Compiling alloc-stdlib v0.2.2
+   Compiling unic-ucd-version v0.9.0
+   Compiling deranged v0.5.8
+   Compiling unic-char-property v0.9.0
+   Compiling servo_arc v0.4.3
+   Compiling objc2-encode v4.1.0
+   Compiling bitflags v2.11.1
+   Compiling once_cell v1.21.4
+   Compiling rustc-hash v2.1.2
+   Compiling bit-vec v0.8.0
+   Compiling hashbrown v0.17.1
+   Compiling schemars v0.8.22
+   Compiling equivalent v1.0.2
+   Compiling fnv v1.0.7
+   Compiling hashbrown v0.12.3
+   Compiling version_check v0.9.5
+   Compiling core-foundation-sys v0.8.7
+   Compiling bit-set v0.8.0
+   Compiling unic-ucd-ident v0.9.0
+   Compiling brotli-decompressor v5.0.0
+   Compiling quick-xml v0.39.4
+   Compiling base64 v0.22.1
+   Compiling dyn-clone v1.0.20
+   Compiling time v0.3.47
+   Compiling same-file v1.0.6
+   Compiling foldhash v0.2.0
+   Compiling base64 v0.21.7
+   Compiling dunce v1.0.5
+   Compiling ctor v0.8.0
+   Compiling parking_lot v0.12.5
+   Compiling indexmap v2.14.0
+   Compiling walkdir v2.5.0
+   Compiling crc32fast v1.5.0
+   Compiling glob v0.3.3
+   Compiling pin-project-lite v0.2.17
+   Compiling string_cache v0.9.0
+   Compiling http v1.4.0
+   Compiling syn v2.0.117
+   Compiling string_cache_codegen v0.6.1
+   Compiling socket2 v0.6.3
+   Compiling mio v1.2.0
+   Compiling brotli v8.0.2
+   Compiling regex-automata v0.4.14
+   Compiling core-foundation v0.10.1
+   Compiling option-ext v0.2.0
+   Compiling futures-core v0.3.32
+   Compiling winnow v0.7.15
+   Compiling generic-array v0.14.7
+   Compiling errno v0.3.14
+   Compiling dirs-sys v0.5.0
+   Compiling heck v0.5.0
+   Compiling web_atoms v0.2.4
+   Compiling dirs v6.0.0
+   Compiling time-macros v0.2.27
+   Compiling tokio v1.52.3
+   Compiling futures-sink v0.3.32
+   Compiling serde_spanned v1.1.1
+   Compiling semver v1.0.28
+   Compiling uuid v1.23.1
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling toml_datetime v0.7.5+spec-1.1.0
+   Compiling simd-adler32 v0.3.9
+   Compiling toml v1.1.2+spec-1.1.0
+   Compiling rustc_version v0.4.1
+   Compiling crossbeam-utils v0.8.21
+   Compiling cfb v0.7.3
+   Compiling typenum v1.20.0
+   Compiling serde-untagged v0.1.9
+   Compiling toml v0.9.12+spec-1.1.0
+   Compiling adler2 v2.0.1
+   Compiling infer v0.19.0
+   Compiling miniz_oxide v0.8.9
+   Compiling cookie v0.18.1
+   Compiling embed-resource v3.0.9
+   Compiling block2 v0.6.2
+   Compiling objc2-core-foundation v0.3.2
+   Compiling regex v1.12.3
+   Compiling slab v0.4.12
+   Compiling raw-window-handle v0.6.2
+   Compiling tauri-winres v0.3.6
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling flate2 v1.1.9
+   Compiling crossbeam-channel v0.5.15
+   Compiling fdeflate v0.3.7
+   Compiling synstructure v0.13.2
+   Compiling darling_core v0.23.0
+   Compiling serde_derive_internals v0.29.1
+   Compiling objc2-foundation v0.3.2
+   Compiling foreign-types-shared v0.3.1
+   Compiling bitflags v1.3.2
+   Compiling rustix v1.1.4
+   Compiling png v0.17.16
+   Compiling digest v0.10.7
+   Compiling core-graphics-types v0.2.0
+   Compiling http-body v1.0.1
+   Compiling cpufeatures v0.2.17
+   Compiling tracing-core v0.1.36
+   Compiling zerofrom-derive v0.1.7
+   Compiling yoke-derive v0.8.2
+   Compiling serde_derive v1.0.228
+   Compiling zerovec-derive v0.11.3
+   Compiling displaydoc v0.2.5
+   Compiling phf_macros v0.13.1
+   Compiling thiserror-impl v2.0.18
+   Compiling thiserror-impl v1.0.69
+   Compiling derive_more-impl v2.1.1
+   Compiling cssparser-macros v0.6.1
+   Compiling schemars_derive v0.8.22
+   Compiling foreign-types-macros v0.2.3
+   Compiling system-configuration-sys v0.6.0
+   Compiling phf v0.13.1
+   Compiling darling_macro v0.23.0
+   Compiling zerofrom v0.1.7
+   Compiling futures-io v0.3.32
+   Compiling derive_more v2.1.1
+   Compiling wry v0.55.1
+   Compiling futures-task v0.3.32
+   Compiling cssparser v0.36.0
+   Compiling darling v0.23.0
+   Compiling foreign-types v0.5.0
+   Compiling unicode-segmentation v1.13.2
+   Compiling yoke v0.8.2
+   Compiling httparse v1.10.1
+   Compiling tauri-runtime v2.11.1
+   Compiling futures-util v0.3.32
+   Compiling tokio-util v0.7.18
+   Compiling tracing v0.1.44
+   Compiling markup5ever v0.38.0
+   Compiling serde_with_macros v3.20.0
+   Compiling core-graphics v0.25.0
+   Compiling html5ever v0.38.0
+   Compiling sha2 v0.10.9
+   Compiling png v0.18.1
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling ico v0.5.0
+   Compiling dispatch2 v0.3.1
+   Compiling security-framework-sys v2.17.0
+   Compiling try-lock v0.2.5
+   Compiling signal-hook v0.3.18
+   Compiling tauri-runtime-wry v2.11.1
+   Compiling atomic-waker v1.1.2
+   Compiling serde_with v3.20.0
+   Compiling tower-service v0.3.3
+   Compiling objc2-app-kit v0.3.2
+   Compiling getrandom v0.3.4
+   Compiling native-tls v0.2.18
+   Compiling tempfile v3.27.0
+   Compiling dom_query v0.27.0
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling cargo-platform v0.1.9
+   Compiling icu_collections v2.2.0
+   Compiling icu_locale_core v2.2.0
+   Compiling swift-rs v1.0.7
+   Compiling jsonptr v0.6.3
+   Compiling plist v1.9.0
+   Compiling cargo_toml v0.22.3
+   Compiling cargo_metadata v0.19.2
+   Compiling dpi v0.1.2
+   Compiling json-patch v3.0.1
+   Compiling keyboard-types v0.7.0
+   Compiling h2 v0.4.19
+   Compiling want v0.3.1
+   Compiling icu_provider v2.2.0
+   Compiling security-framework v3.7.0
+   Compiling serialize-to-javascript-impl v0.1.2
+   Compiling objc2-core-graphics v0.3.2
+   Compiling icu_properties v2.2.0
+   Compiling icu_normalizer v2.2.0
+   Compiling futures-channel v0.3.32
+   Compiling signal-hook-registry v1.4.8
+   Compiling core-foundation v0.9.4
+   Compiling mime v0.3.17
+   Compiling serialize-to-javascript v0.1.2
+   Compiling serde_repr v0.1.20
+   Compiling system-configuration v0.7.0
+   Compiling sync_wrapper v1.0.2
+   Compiling os_pipe v1.2.3
+   Compiling ipnet v2.12.0
+   Compiling pathdiff v0.2.3
+   Compiling tower-layer v0.3.3
+   Compiling embed_plist v1.2.2
+   Compiling open v5.3.4
+   Compiling sigchld v0.2.4
+   Compiling http-body-util v0.1.3
+   Compiling tower v0.5.3
+   Compiling encoding_rs v0.8.35
+   Compiling ryu v1.0.23
+   Compiling zeroize v1.9.0
+   Compiling shared_child v1.1.1
+   Compiling rustls-pki-types v1.15.1
+   Compiling tokio-native-tls v0.3.1
+   Compiling idna_adapter v1.2.2
+   Compiling serde_urlencoded v0.7.1
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling hyper v1.9.0
+   Compiling urlpattern v0.3.0
+   Compiling tower-http v0.6.10
+   Compiling hyper-util v0.1.20
+   Compiling tauri-utils v2.9.1
+   Compiling objc2-web-kit v0.3.2
+   Compiling muda v0.19.1
+   Compiling tao v0.35.2
+   Compiling window-vibrancy v0.6.0
+   Compiling tray-icon v0.23.1
+   Compiling hyper-tls v0.6.0
+   Compiling reqwest v0.12.28
+   Compiling tauri-build v2.6.1
+   Compiling tauri-plugin v2.6.1
+   Compiling tauri-codegen v2.6.1
+   Compiling tauri v2.11.1
+   Compiling tauri-macros v2.6.1
+   Compiling tauri-plugin-opener v2.5.4
+   Compiling tauri-plugin-shell v2.3.5
+   Compiling loki-alfred v0.1.0 (/Users/agent/Desktop/LokiAlfred/Alfred/src-tauri)
+    Finished `release` profile [optimized] target(s) in 39.65s
+       Built application at: /Users/agent/Desktop/LokiAlfred/Alfred/src-tauri/target/release/loki-alfred
+    Bundling loki-alfred.app (/Users/agent/Desktop/LokiAlfred/Alfred/src-tauri/target/release/bundle/macos/loki-alfred.app)
+     Signing with identity "-"
+Signing with identity "-"
+Signing /Users/agent/Desktop/LokiAlfred/Alfred/src-tauri/target/release/bundle/macos/loki-alfred.app/Contents/MacOS/backend
+/Users/agent/Desktop/LokiAlfred/Alfred/src-tauri/target/release/bundle/macos/loki-alfred.app/Contents/MacOS/backend: replacing existing signature
+Signing with identity "-"
+Signing /Users/agent/Desktop/LokiAlfred/Alfred/src-tauri/target/release/bundle/macos/loki-alfred.app/Contents/MacOS/loki-alfred
+/Users/agent/Desktop/LokiAlfred/Alfred/src-tauri/target/release/bundle/macos/loki-alfred.app/Contents/MacOS/loki-alfred: replacing existing signature
+Signing with identity "-"
+Signing /Users/agent/Desktop/LokiAlfred/Alfred/src-tauri/target/release/bundle/macos/loki-alfred.app
+/Users/agent/Desktop/LokiAlfred/Alfred/src-tauri/target/release/bundle/macos/loki-alfred.app: replacing existing signature
+        Warn skipping app notarization, no APPLE_ID & APPLE_PASSWORD & APPLE_TEAM_ID or APPLE_API_KEY & APPLE_API_ISSUER & APPLE_API_KEY_PATH environment variables found
+    Bundling loki-alfred_0.1.0_aarch64.dmg (/Users/agent/Desktop/LokiAlfred/Alfred/src-tauri/target/release/bundle/dmg/loki-alfred_0.1.0_aarch64.dmg)
+     Running bundle_dmg.sh
+failed to bundle project error running bundle_dmg.sh: `failed to run /Users/agent/Desktop/LokiAlfred/Alfred/src-tauri/target/release/bundle/dmg/bundle_dmg.sh`
+       Error failed to bundle project error running bundle_dmg.sh: `failed to run /Users/agent/Desktop/LokiAlfred/Alfred/src-tauri/target/release/bundle/dmg/bundle_dmg.sh`
